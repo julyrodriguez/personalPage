@@ -1,7 +1,33 @@
 import { NextRequest } from 'next/server';
 
+export const SESSION_COOKIE_NAME = 'personal_os_session';
+
+export function getDashboardPassword(): string {
+  return process.env.DASHBOARD_PASSWORD || 'julian2025';
+}
+
+export function verifyPassword(password: string): boolean {
+  const expected = getDashboardPassword();
+  return password.trim() === expected.trim();
+}
+
+export function generateSessionToken(): string {
+  const secret = process.env.API_SECRET_KEY || 'pos_hub_secret_token_2025_power_user';
+  const pass = getDashboardPassword();
+  const raw = `pos_session_${secret}_${pass}_authenticated`;
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(raw).toString('base64url');
+  }
+  return btoa(raw).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+export function isValidSession(token?: string): boolean {
+  if (!token) return false;
+  return token === generateSessionToken();
+}
+
 /**
- * Valida la cabecera de autorización de peticiones entrantes.
+ * Valida la cabecera de autorización de peticiones entrantes para agentes externos.
  * Acepta:
  * - Authorization: Bearer <API_SECRET_KEY>
  * - x-api-key: <API_SECRET_KEY>

@@ -1,12 +1,1 @@
-{
-  "power-bi": {
-    "courseId": "power-bi",
-    "completedLessons": [
-      "01-fundamentos-power-bi",
-      "02-power-query-etl",
-      "03-modelado-estrella-relaciones"
-    ],
-    "lastLessonSlug": "01-fundamentos-power-bi",
-    "updatedAt": "2026-09-14T20:07:30.054Z"
-  }
-}
+{}

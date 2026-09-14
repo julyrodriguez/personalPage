@@ -39,10 +39,10 @@ export function StudyProgressWidget() {
           };
         }
 
-        const completedCount = progress?.completedLessons?.length ?? 3;
+        const completedCount = progress?.completedLessons?.length ?? 0;
         const total = courseData.totalLessons || 10;
         const percentage = Math.round((completedCount / total) * 100);
-        const lastSlug = progress?.lastLessonSlug || '04-introduccion-dax-calculadas-medidas';
+        const lastSlug = progress?.lastLessonSlug || '01-fundamentos-power-bi';
 
         setCourse({
           id: 'power-bi',
@@ -67,9 +67,9 @@ export function StudyProgressWidget() {
     loadCourse();
   }, []);
 
-  const completed = course?.completedCount ?? 3;
+  const completed = course?.completedCount ?? 0;
   const total = course?.lessonsCount ?? 10;
-  const percentage = course?.progressPercentage ?? 30;
+  const percentage = course?.progressPercentage ?? 0;
 
   return (
     <Card className="border-slate-200/80 dark:border-slate-800/80 bg-gradient-to-br from-white via-white to-indigo-50/30 dark:from-slate-900/90 dark:via-slate-900/90 dark:to-indigo-950/20 overflow-hidden">
@@ -140,15 +140,15 @@ export function StudyProgressWidget() {
         {/* Quick Continue Button */}
         <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <Link
-            href="/cursos/power-bi/04-introduccion-dax-calculadas-medidas"
+            href="/cursos/power-bi/01-fundamentos-power-bi"
             className="flex-1"
           >
             <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-500/20 text-xs py-2 h-9 rounded-xl flex items-center justify-center gap-2">
               <PlayCircle className="w-4 h-4" />
-              <span>Continuar: Lección 04 (DAX)</span>
+              <span>{completed > 0 ? 'Continuar Lección' : 'Comenzar Lección 01'}</span>
             </Button>
           </Link>
-          <Link href="/cursos/power-bi/01-fundamentos-power-bi" className="w-full sm:w-auto">
+          <Link href="/cursos/power-bi" className="w-full sm:w-auto">
             <Button variant="outline" size="sm" className="w-full sm:w-auto h-9 px-3 text-xs rounded-xl">
               Ver Temario
             </Button>

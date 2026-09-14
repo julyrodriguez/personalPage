@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import {
   LayoutDashboard,
@@ -13,6 +13,7 @@ import {
   X,
   Sparkles,
   ChevronRight,
+  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -20,48 +21,60 @@ import { ThemeToggle } from './theme-toggle';
 const NAV_ITEMS = [
   {
     name: 'Dashboard',
-    shortName: 'Inicio',
     href: '/',
     icon: LayoutDashboard,
-    description: 'Bento Grid & Resumen',
+    description: 'Resumen & Bento Grid',
   },
   {
     name: 'Cursos',
-    shortName: 'Cursos',
     href: '/cursos',
     icon: GraduationCap,
-    description: 'Power BI & Tech Hub',
+    description: 'Power BI Masterclass',
     badge: '10 Clases',
   },
   {
     name: 'Tareas',
-    shortName: 'Tareas',
     href: '/tareas',
     icon: CheckSquare,
-    description: 'Kanban & Daily Focus',
+    description: 'Planificador & Kanban',
   },
   {
     name: 'Notas',
-    shortName: 'Notas',
     href: '/notas',
     icon: FileText,
-    description: 'Bitácora & Snippets',
+    description: 'Bitácora & Cheat Sheets',
   },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // If on login page, don't show sidebar
+  if (pathname === '/login') {
+    return null;
+  }
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href);
   };
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+      router.refresh();
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <>
-      {/* Mobile Top Header Bar */}
-      <div className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-white/90 dark:bg-[#080c14]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800">
+      {/* Mobile Top Header Bar (100% width on top of screen) */}
+      <div className="md:hidden sticky top-0 z-40 w-full flex items-center justify-between px-4 py-3 bg-white/95 dark:bg-[#080c14]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-blue-500/20">
             <Sparkles className="w-4 h-4" />
@@ -75,11 +88,12 @@ export function Sidebar() {
             </span>
           </div>
         </div>
+
         <div className="flex items-center gap-1.5">
           <ThemeToggle />
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -87,7 +101,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Mobile Backdrop */}
+      {/* Mobile Drawer Backdrop */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs md:hidden animate-in fade-in duration-200"
@@ -95,11 +109,13 @@ export function Sidebar() {
         />
       )}
 
-      {/* Sidebar Container (Desktop Persistent + Mobile Drawer) */}
+      {/* Sidebar Container: completely hidden on mobile unless mobileOpen is true */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex flex-col w-72 bg-white dark:bg-slate-900/95 border-r border-slate-200/80 dark:border-slate-800/80 transition-transform duration-300 ease-in-out md:translate-x-0',
-          mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+          'w-72 bg-white dark:bg-slate-900/95 border-r border-slate-200/80 dark:border-slate-800/80 transition-all duration-200',
+          mobileOpen
+            ? 'fixed inset-y-0 left-0 z-50 flex flex-col shadow-2xl animate-in slide-in-from-left duration-200'
+            : 'hidden md:fixed md:inset-y-0 md:left-0 md:z-30 md:flex md:flex-col'
         )}
       >
         {/* Brand Header */}
@@ -195,85 +211,56 @@ export function Sidebar() {
             );
           })}
 
-          {/* Quick External Ingest Section */}
+          {/* Integration Status Badge */}
           <div className="pt-6 px-3">
             <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-              Agentes & Automatización
+              Conexión Externa
             </p>
           </div>
 
-          <div className="mx-1 mt-2 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800">
-            <div className="flex items-center gap-2 mb-1.5">
-              <Webhook className="w-4 h-4 text-blue-500" />
+          <div className="mx-1 mt-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800">
+            <div className="flex items-center gap-2 mb-1">
+              <Webhook className="w-3.5 h-3.5 text-blue-500" />
               <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                API Ingestion Activa
+                Data Processor Sync
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-2.5">
-              Tus bots y webhooks pueden inyectar tareas, notas y clases de cursos con Bearer token.
-            </p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mt-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
-                Ready: /api/ingest/*
+                apivacas.jariel.com.ar
               </span>
             </div>
           </div>
         </nav>
 
-        {/* User Profile / Status Footer */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800/60">
-          <div className="flex items-center gap-3 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800">
-            <div className="relative">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-500 text-white font-bold flex items-center justify-center text-xs">
+        {/* User Profile & Logout Footer */}
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800/60 space-y-2">
+          <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-500 text-white font-bold flex items-center justify-center text-xs shrink-0">
                 JU
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                  Julián Rodríguez
+                </p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                  Buenos Aires, AR
+                </p>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
-                Julián | Personal OS
-              </p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                Buenos Aires, AR
-              </p>
-            </div>
+
+            <button
+              onClick={handleLogout}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+              title="Cerrar sesión"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </aside>
-
-      {/* Mobile Sticky Bottom Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#080c14]/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 py-1.5 px-3 flex items-center justify-around shadow-lg">
-        {NAV_ITEMS.map((item) => {
-          const active = isActive(item.href);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-200 relative min-w-[60px]',
-                active
-                  ? 'text-blue-600 dark:text-blue-400 font-bold'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-              )}
-            >
-              <div className="relative">
-                <Icon className={cn('w-5 h-5 transition-transform', active && 'scale-110')} />
-                {item.badge && (
-                  <span className="absolute -top-1 -right-2.5 w-2 h-2 rounded-full bg-emerald-500" />
-                )}
-              </div>
-              <span className="text-[10px] mt-1 font-medium tracking-tight">
-                {item.shortName || item.name}
-              </span>
-              {active && (
-                <span className="absolute bottom-0 w-6 h-0.5 rounded-full bg-blue-600 dark:bg-blue-400" />
-              )}
-            </Link>
-          );
-        })}
-      </nav>
     </>
   );
 }

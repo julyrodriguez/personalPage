@@ -3,11 +3,10 @@ import { WeatherWidget } from '@/components/dashboard/weather-widget';
 import { StudyProgressWidget } from '@/components/dashboard/study-progress-widget';
 import { TaskWidget } from '@/components/dashboard/task-widget';
 import { NotesWidget } from '@/components/dashboard/notes-widget';
-import { SystemStatusWidget } from '@/components/dashboard/system-status-widget';
 
 export const metadata = {
   title: 'Dashboard Principal | Personal OS',
-  description: 'Hub central de vida, estudio y automatización personal con Bento Grid',
+  description: 'Hub central de vida, estudio y gestión personal con Bento Grid',
 };
 
 export default function DashboardPage() {
@@ -16,8 +15,8 @@ export default function DashboardPage() {
       {/* Header with live clock & greeting */}
       <Header />
 
-      {/* Bento Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Bento Grid Clean Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
         {/* Weather Widget (1 col) */}
         <div className="lg:col-span-1">
           <WeatherWidget />
@@ -36,11 +35,6 @@ export default function DashboardPage() {
         {/* Notes & Bitácora Widget (1 col) */}
         <div className="lg:col-span-1">
           <NotesWidget />
-        </div>
-
-        {/* Ingestion API & Automation Gateway (3 cols full width) */}
-        <div className="col-span-1 md:col-span-2 lg:col-span-3">
-          <SystemStatusWidget />
         </div>
       </div>
     </div>

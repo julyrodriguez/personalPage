@@ -17,15 +17,6 @@ const COURSES_CATALOG: Record<string, Omit<Course, 'lessons' | 'lessonsCount' | 
     estimatedHours: 40,
     tags: ['Power BI', 'DAX', 'Power Query', 'M', 'Modelado Dimensional', 'SQL'],
   },
-  'nextjs-fullstack': {
-    id: 'nextjs-fullstack',
-    title: 'Next.js Moderno y Arquitectura Frontend Escalable',
-    description: 'Aprende App Router, Server Components, caching de alto rendimiento, Tailwind CSS y diseño de dashboards con Bento Grid.',
-    category: 'Desarrollo Web',
-    level: 'Intermedio',
-    estimatedHours: 25,
-    tags: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Full-Stack'],
-  },
 };
 
 function ensureCoursesDir(courseId?: string) {

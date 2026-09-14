@@ -19,20 +19,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen bg-slate-50/50 dark:bg-[#080c14] text-slate-900 dark:text-slate-100 transition-colors`}>
+      <body className={`${inter.className} min-h-screen bg-slate-50/50 dark:bg-[#080c14] text-slate-900 dark:text-slate-100 transition-colors overflow-x-hidden`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex min-h-screen">
-            {/* Persistent Global Sidebar */}
+          <div className="min-h-screen w-full flex flex-col md:flex-row overflow-x-hidden">
+            {/* Top header on mobile, fixed sidebar on desktop */}
             <Sidebar />
 
             {/* Main Content Area */}
-            <main className="flex-1 md:pl-72 flex flex-col min-w-0">
-              <div className="flex-1 p-3 sm:p-6 lg:p-8 pb-24 md:pb-8 max-w-7xl w-full mx-auto">
+            <main className="flex-1 md:pl-72 flex flex-col min-w-0 w-full overflow-x-hidden">
+              <div className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
                 {children}
               </div>
             </main>
