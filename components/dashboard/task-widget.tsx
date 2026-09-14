@@ -178,11 +178,11 @@ export function TaskWidget() {
         </div>
 
         {/* Tab Selection & Filter */}
-        <div className="flex items-center justify-between pt-3 gap-2">
-          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-3 gap-2.5">
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl text-xs w-full sm:w-auto overflow-x-auto">
             <button
               onClick={() => setActiveTab('today')}
-              className={`px-3 py-1 rounded-lg font-medium transition-all ${
+              className={`flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg font-medium transition-all text-xs whitespace-nowrap ${
                 activeTab === 'today'
                   ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -192,7 +192,7 @@ export function TaskWidget() {
             </button>
             <button
               onClick={() => setActiveTab('upcoming')}
-              className={`px-3 py-1 rounded-lg font-medium transition-all ${
+              className={`flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg font-medium transition-all text-xs whitespace-nowrap ${
                 activeTab === 'upcoming'
                   ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -202,7 +202,7 @@ export function TaskWidget() {
             </button>
             <button
               onClick={() => setActiveTab('completed')}
-              className={`px-3 py-1 rounded-lg font-medium transition-all ${
+              className={`flex-1 sm:flex-initial text-center px-3 py-1.5 rounded-lg font-medium transition-all text-xs whitespace-nowrap ${
                 activeTab === 'completed'
                   ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -215,7 +215,7 @@ export function TaskWidget() {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="text-[11px] bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-2 py-1 text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer"
+            className="text-[11px] bg-slate-100 dark:bg-slate-800 border-none rounded-xl px-2.5 py-1.5 text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer w-full sm:w-auto"
           >
             <option value="all">Prioridad: Todas</option>
             <option value="high">Solo Alta</option>
@@ -290,31 +290,33 @@ export function TaskWidget() {
         </div>
 
         {/* Quick Add Form */}
-        <form onSubmit={handleQuickAdd} className="pt-2 border-t border-slate-100 dark:border-slate-800 flex gap-2">
+        <form onSubmit={handleQuickAdd} className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-2">
           <input
             type="text"
             placeholder="Añadir tarea rápida..."
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
-            className="flex-1 h-8 px-3 rounded-xl text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="flex-1 h-9 px-3 rounded-xl text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <select
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            className="h-8 px-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer"
-          >
-            <option value="Estudio">Estudio</option>
-            <option value="Desarrollo">Desarrollo</option>
-            <option value="Personal">Personal</option>
-          </select>
-          <Button
-            type="submit"
-            size="sm"
-            disabled={isAdding || !newTitle.trim()}
-            className="h-8 px-3 rounded-xl text-xs"
-          >
-            <Plus className="w-3.5 h-3.5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <select
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              className="flex-1 sm:flex-initial h-9 px-2.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer"
+            >
+              <option value="Estudio">Estudio</option>
+              <option value="Desarrollo">Desarrollo</option>
+              <option value="Personal">Personal</option>
+            </select>
+            <Button
+              type="submit"
+              size="sm"
+              disabled={isAdding || !newTitle.trim()}
+              className="h-9 px-3.5 rounded-xl text-xs shrink-0"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>

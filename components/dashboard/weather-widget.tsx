@@ -149,24 +149,24 @@ export function WeatherWidget() {
               <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
                 Pronóstico 3 Días
               </p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                 {data.daily.map((day) => (
                   <div
                     key={day.date}
-                    className="p-2 rounded-xl bg-white dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-800 text-center flex flex-col items-center"
+                    className="p-1.5 sm:p-2 rounded-xl bg-white dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-800 text-center flex flex-col items-center"
                   >
-                    <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+                    <span className="text-[10px] sm:text-[11px] font-medium text-slate-600 dark:text-slate-400">
                       {formatDayName(day.date)}
                     </span>
                     <div className="my-1">
-                      {getWeatherIcon(day.weatherCode, 'w-5 h-5')}
+                      {getWeatherIcon(day.weatherCode, 'w-4 h-4 sm:w-5 sm:h-5')}
                     </div>
-                    <div className="text-[11px] font-semibold text-slate-800 dark:text-slate-200">
+                    <div className="text-[10px] sm:text-[11px] font-semibold text-slate-800 dark:text-slate-200">
                       <span>{day.maxTemp}°</span>
-                      <span className="text-slate-400 font-normal ml-1">{day.minTemp}°</span>
+                      <span className="text-slate-400 font-normal ml-0.5">{day.minTemp}°</span>
                     </div>
                     {typeof day.precipitationProbability === 'number' && day.precipitationProbability > 0 && (
-                      <span className="text-[9px] text-blue-500 font-mono mt-0.5">
+                      <span className="text-[8px] sm:text-[9px] text-blue-500 font-mono mt-0.5">
                         {day.precipitationProbability}% ll
                       </span>
                     )}

@@ -85,7 +85,7 @@ export function CodeBlock({ language = 'text', code }: CodeBlockProps) {
   return (
     <div className="relative my-5 rounded-2xl overflow-hidden border border-slate-800 bg-[#0d1117] text-slate-100 shadow-lg">
       {/* Code Header Bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#161b22] border-b border-slate-800/80 text-xs">
+      <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 bg-[#161b22] border-b border-slate-800/80 text-xs">
         <div className="flex items-center gap-2">
           <div className="flex gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
@@ -119,7 +119,7 @@ export function CodeBlock({ language = 'text', code }: CodeBlockProps) {
       </div>
 
       {/* Code Content */}
-      <div className="p-4 overflow-x-auto text-xs leading-relaxed font-mono">
+      <div className="p-3 sm:p-4 overflow-x-auto text-[11px] sm:text-xs leading-relaxed font-mono">
         {highlightedHtml ? (
           <pre
             className={`language-${normalizedLang}`}

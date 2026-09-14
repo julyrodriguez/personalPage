@@ -20,12 +20,14 @@ import { ThemeToggle } from './theme-toggle';
 const NAV_ITEMS = [
   {
     name: 'Dashboard',
+    shortName: 'Inicio',
     href: '/',
     icon: LayoutDashboard,
     description: 'Bento Grid & Resumen',
   },
   {
     name: 'Cursos',
+    shortName: 'Cursos',
     href: '/cursos',
     icon: GraduationCap,
     description: 'Power BI & Tech Hub',
@@ -33,12 +35,14 @@ const NAV_ITEMS = [
   },
   {
     name: 'Tareas',
+    shortName: 'Tareas',
     href: '/tareas',
     icon: CheckSquare,
     description: 'Kanban & Daily Focus',
   },
   {
     name: 'Notas',
+    shortName: 'Notas',
     href: '/notas',
     icon: FileText,
     description: 'Bitácora & Snippets',
@@ -56,23 +60,27 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile Top Bar with Hamburger */}
-      <div className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+      {/* Mobile Top Header Bar */}
+      <div className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-white/90 dark:bg-[#080c14]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-blue-500/20">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-bold text-sm tracking-tight text-slate-900 dark:text-white">Personal OS</span>
-            <span className="block text-[10px] text-slate-500 dark:text-slate-400">Hub de Vida & Estudio</span>
+            <span className="font-bold text-sm tracking-tight text-slate-900 dark:text-white">
+              Personal OS
+            </span>
+            <span className="block text-[10px] text-slate-500 dark:text-slate-400">
+              Hub de Vida & Estudio
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <ThemeToggle />
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-            aria-label="Abrir menú"
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -82,7 +90,7 @@ export function Sidebar() {
       {/* Mobile Backdrop */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs md:hidden animate-in fade-in duration-200"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -91,7 +99,7 @@ export function Sidebar() {
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex flex-col w-72 bg-white dark:bg-slate-900/95 border-r border-slate-200/80 dark:border-slate-800/80 transition-transform duration-300 ease-in-out md:translate-x-0',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+          mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         )}
       >
         {/* Brand Header */}
@@ -116,9 +124,17 @@ export function Sidebar() {
               <p className="text-xs text-slate-500 dark:text-slate-400">Hub de Vida y Estudio</p>
             </div>
           </Link>
+
           <div className="hidden md:block">
             <ThemeToggle />
           </div>
+
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Navigation Items */}
@@ -225,6 +241,39 @@ export function Sidebar() {
           </div>
         </div>
       </aside>
+
+      {/* Mobile Sticky Bottom Navigation Bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#080c14]/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 py-1.5 px-3 flex items-center justify-around shadow-lg">
+        {NAV_ITEMS.map((item) => {
+          const active = isActive(item.href);
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-200 relative min-w-[60px]',
+                active
+                  ? 'text-blue-600 dark:text-blue-400 font-bold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              )}
+            >
+              <div className="relative">
+                <Icon className={cn('w-5 h-5 transition-transform', active && 'scale-110')} />
+                {item.badge && (
+                  <span className="absolute -top-1 -right-2.5 w-2 h-2 rounded-full bg-emerald-500" />
+                )}
+              </div>
+              <span className="text-[10px] mt-1 font-medium tracking-tight">
+                {item.shortName || item.name}
+              </span>
+              {active && (
+                <span className="absolute bottom-0 w-6 h-0.5 rounded-full bg-blue-600 dark:bg-blue-400" />
+              )}
+            </Link>
+          );
+        })}
+      </nav>
     </>
   );
 }

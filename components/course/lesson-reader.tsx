@@ -78,7 +78,7 @@ export function LessonReader({
   return (
     <article className="max-w-4xl mx-auto space-y-8">
       {/* Lesson Header Card */}
-      <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-6 sm:p-8 shadow-sm backdrop-blur-sm">
+      <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-4 sm:p-8 shadow-sm backdrop-blur-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
@@ -97,7 +97,7 @@ export function LessonReader({
             disabled={updating}
             variant={completed ? 'secondary' : 'default'}
             size="sm"
-            className={`rounded-xl text-xs gap-2 font-semibold transition-all ${
+            className={`w-full sm:w-auto rounded-xl text-xs gap-2 font-semibold transition-all ${
               completed
                 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
@@ -117,7 +117,7 @@ export function LessonReader({
           </Button>
         </div>
 
-        <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
           {lesson.title}
         </h1>
 
@@ -142,7 +142,7 @@ export function LessonReader({
       </div>
 
       {/* Lesson Content Rendered */}
-      <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-6 sm:p-10 shadow-sm backdrop-blur-sm">
+      <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-4 sm:p-8 lg:p-10 shadow-sm backdrop-blur-sm">
         <div className="prose prose-slate dark:prose-invert max-w-none text-slate-800 dark:text-slate-200">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
@@ -292,16 +292,16 @@ export function LessonReader({
       </div>
 
       {/* Bottom Navigation: Prev / Next */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 p-4 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 shadow-sm">
         {prevLesson ? (
           <Link
             href={`/cursos/${lesson.courseId}/${prevLesson.lessonSlug}`}
-            className="w-full sm:w-auto flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+            className="w-full sm:w-auto flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group border border-slate-100 dark:border-slate-800 sm:border-none"
           >
-            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-colors shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </div>
-            <div className="text-left">
+            <div className="text-left min-w-0">
               <span className="block text-[10px] uppercase font-bold text-slate-400">
                 Clase Anterior
               </span>
@@ -311,14 +311,14 @@ export function LessonReader({
             </div>
           </Link>
         ) : (
-          <div />
+          <div className="hidden sm:block" />
         )}
 
         <Button
           onClick={toggleCompletion}
           disabled={updating}
           variant={completed ? 'secondary' : 'default'}
-          className="rounded-xl px-5 text-xs font-semibold"
+          className="w-full sm:w-auto rounded-xl px-5 py-2.5 sm:py-2 text-xs font-semibold"
         >
           {completed ? '✓ Completada' : 'Marcar como completada'}
         </Button>
@@ -326,9 +326,9 @@ export function LessonReader({
         {nextLesson ? (
           <Link
             href={`/cursos/${lesson.courseId}/${nextLesson.lessonSlug}`}
-            className="w-full sm:w-auto flex items-center justify-end gap-3 p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group text-right"
+            className="w-full sm:w-auto flex items-center justify-end sm:justify-end gap-3 p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group text-right border border-slate-100 dark:border-slate-800 sm:border-none"
           >
-            <div>
+            <div className="min-w-0">
               <span className="block text-[10px] uppercase font-bold text-slate-400">
                 Siguiente Clase
               </span>
@@ -336,12 +336,12 @@ export function LessonReader({
                 {nextLesson.title}
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-colors shrink-0">
               <ArrowRight className="w-4 h-4" />
             </div>
           </Link>
         ) : (
-          <div />
+          <div className="hidden sm:block" />
         )}
       </div>
     </article>

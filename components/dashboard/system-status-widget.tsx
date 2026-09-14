@@ -82,7 +82,7 @@ export function SystemStatusWidget() {
               )}
             </button>
           </div>
-          <pre className="text-[11px] leading-relaxed select-all whitespace-pre-wrap">
+          <pre className="text-[10px] sm:text-[11px] leading-relaxed select-all whitespace-pre-wrap break-all sm:break-normal">
             {curlExample}
           </pre>
         </div>

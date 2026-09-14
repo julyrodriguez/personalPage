@@ -37,6 +37,7 @@ export default function TareasPage() {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [mobileKanbanTab, setMobileKanbanTab] = useState<'all' | TaskStatus>('all');
 
   // Modal / Form state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -261,17 +262,51 @@ export default function TareasPage() {
 
       {/* Kanban Board View */}
       {viewMode === 'kanban' ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {COLUMNS.map((col) => {
-            const colTasks = filteredTasks.filter((t) => t.status === col.id);
+        <div className="space-y-4">
+          {/* Mobile Column Switcher */}
+          <div className="md:hidden flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-x-auto gap-1">
+            <button
+              onClick={() => setMobileKanbanTab('all')}
+              className={`flex-1 text-center py-1.5 px-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                mobileKanbanTab === 'all'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400'
+              }`}
+            >
+              Todas ({filteredTasks.length})
+            </button>
+            {COLUMNS.map((col) => {
+              const count = filteredTasks.filter((t) => t.status === col.id).length;
+              return (
+                <button
+                  key={col.id}
+                  onClick={() => setMobileKanbanTab(col.id)}
+                  className={`flex-1 text-center py-1.5 px-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                    mobileKanbanTab === col.id
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  {col.label} ({count})
+                </button>
+              );
+            })}
+          </div>
 
-            return (
-              <div
-                key={col.id}
-                className="flex flex-col rounded-2xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 p-4 min-h-[450px]"
-              >
-                {/* Column Header */}
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/60 dark:border-slate-800">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {COLUMNS.map((col) => {
+              const colTasks = filteredTasks.filter((t) => t.status === col.id);
+              const isHiddenOnMobile = mobileKanbanTab !== 'all' && mobileKanbanTab !== col.id;
+
+              return (
+                <div
+                  key={col.id}
+                  className={`flex-col rounded-2xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 p-4 min-h-[400px] md:min-h-[450px] ${
+                    isHiddenOnMobile ? 'hidden md:flex' : 'flex'
+                  }`}
+                >
+                  {/* Column Header */}
+                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/60 dark:border-slate-800">
                   <div className="flex items-center gap-2">
                     <span className={`w-2.5 h-2.5 rounded-full ${col.color}`} />
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white">
@@ -368,11 +403,12 @@ export default function TareasPage() {
               </div>
             );
           })}
+          </div>
         </div>
       ) : (
         /* Detailed List View */
-        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-x-auto shadow-xs">
+          <table className="w-full min-w-[580px] text-left text-xs border-collapse">
             <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider text-[10px]">
               <tr>
                 <th className="p-3.5">Título / Descripción</th>

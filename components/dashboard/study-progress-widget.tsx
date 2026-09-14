@@ -105,20 +105,20 @@ export function StudyProgressWidget() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 mt-3 text-xs text-slate-600 dark:text-slate-300">
+          <div className="flex flex-wrap items-center gap-y-1 gap-x-2.5 mt-3 text-xs text-slate-600 dark:text-slate-300">
             <span className="flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
               <strong className="font-semibold text-slate-900 dark:text-white">{completed}</strong> de {total} clases
             </span>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
             <span className="flex items-center gap-1">
               <Clock className="w-3.5 h-3.5 text-indigo-500" />
               {course?.estimatedHours ?? 40}h estimadas
             </span>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
             <span className="flex items-center gap-1">
               <Award className="w-3.5 h-3.5 text-amber-500" />
-              Nivel Avanzado
+              Avanzado
             </span>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function StudyProgressWidget() {
         </div>
 
         {/* Quick Continue Button */}
-        <div className="pt-1 flex items-center gap-3">
+        <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <Link
             href="/cursos/power-bi/04-introduccion-dax-calculadas-medidas"
             className="flex-1"
@@ -148,9 +148,9 @@ export function StudyProgressWidget() {
               <span>Continuar: Lección 04 (DAX)</span>
             </Button>
           </Link>
-          <Link href="/cursos/power-bi/01-fundamentos-power-bi">
-            <Button variant="outline" size="sm" className="h-9 px-3 text-xs rounded-xl">
-              Temario
+          <Link href="/cursos/power-bi/01-fundamentos-power-bi" className="w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto h-9 px-3 text-xs rounded-xl">
+              Ver Temario
             </Button>
           </Link>
         </div>

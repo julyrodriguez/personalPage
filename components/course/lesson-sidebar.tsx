@@ -188,16 +188,16 @@ export function LessonSidebar({
   return (
     <>
       {/* Mobile Drawer Trigger Bar */}
-      <div className="lg:hidden flex items-center justify-between p-3 mb-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
-        <div className="flex items-center gap-2">
-          <GraduationCap className="w-4 h-4 text-blue-600" />
-          <span className="text-xs font-bold text-slate-900 dark:text-white">
-            Temario del Curso ({progressPercent}% completado)
+      <div className="lg:hidden sticky top-14 z-30 flex items-center justify-between p-3 mb-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <div className="flex items-center gap-2 truncate pr-2">
+          <GraduationCap className="w-4 h-4 text-blue-600 shrink-0" />
+          <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+            Temario ({progressPercent}% completado)
           </span>
         </div>
         <button
           onClick={() => setIsMobileDrawerOpen(true)}
-          className="px-2.5 py-1 text-xs rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium"
+          className="shrink-0 px-3 py-1.5 text-xs rounded-xl bg-blue-600 text-white font-semibold shadow-xs"
         >
           Ver Clases
         </button>

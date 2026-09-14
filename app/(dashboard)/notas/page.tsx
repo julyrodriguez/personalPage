@@ -12,10 +12,12 @@ import {
   Check,
   Calendar,
   Sparkles,
+  ArrowLeft,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Note } from '@/types';
+import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -25,6 +27,7 @@ export default function NotasPage() {
   const [search, setSearch] = useState('');
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [activeNote, setActiveNote] = useState<Note | null>(null);
+  const [mobileView, setMobileView] = useState<'list' | 'reader'>('list');
 
   // Modal / Form state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -226,10 +229,41 @@ export default function NotasPage() {
         </div>
       </div>
 
+      {/* Mobile Tab Switcher */}
+      <div className="lg:hidden flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4">
+        <button
+          onClick={() => setMobileView('list')}
+          className={cn(
+            'flex-1 text-center py-2 rounded-lg text-xs font-semibold transition-all',
+            mobileView === 'list'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-400'
+          )}
+        >
+          Lista de Apuntes ({filteredNotes.length})
+        </button>
+        <button
+          onClick={() => setMobileView('reader')}
+          className={cn(
+            'flex-1 text-center py-2 rounded-lg text-xs font-semibold transition-all',
+            mobileView === 'reader'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-400'
+          )}
+        >
+          Visor de Apunte
+        </button>
+      </div>
+
       {/* Main 2-Column Layout: Notes List + Active Note Preview */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Notes Cards (5 cols) */}
-        <div className="lg:col-span-5 space-y-3 max-h-[calc(100vh-16rem)] overflow-y-auto pr-1">
+        <div
+          className={cn(
+            'lg:col-span-5 space-y-3 max-h-[calc(100vh-16rem)] overflow-y-auto pr-1',
+            mobileView === 'reader' && 'hidden lg:block'
+          )}
+        >
           {loading ? (
             <div className="py-12 text-center text-xs text-slate-400 animate-pulse">
               Cargando notas...
@@ -244,7 +278,10 @@ export default function NotasPage() {
               return (
                 <div
                   key={note.id}
-                  onClick={() => setActiveNote(note)}
+                  onClick={() => {
+                    setActiveNote(note);
+                    setMobileView('reader');
+                  }}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer group ${
                     isSelected
                       ? 'bg-emerald-500/5 dark:bg-emerald-950/20 border-emerald-500/50 ring-1 ring-emerald-500/20 shadow-xs'
@@ -312,9 +349,18 @@ export default function NotasPage() {
         </div>
 
         {/* Right Column: Active Note Markdown Reader (7 cols) */}
-        <div className="lg:col-span-7">
+        <div className={cn('lg:col-span-7', mobileView === 'list' && 'hidden lg:block')}>
+          {/* Mobile Back Button */}
+          <button
+            onClick={() => setMobileView('list')}
+            className="lg:hidden text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 mb-3 px-1 py-1"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Volver a la lista de notas</span>
+          </button>
+
           {activeNote ? (
-            <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm">
+            <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 shadow-sm">
               <div className="flex items-start justify-between gap-4 pb-4 mb-4 border-b border-slate-200/80 dark:border-slate-800">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
