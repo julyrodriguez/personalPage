@@ -57,6 +57,12 @@ export function CaroNailsWidget() {
     }
   };
 
+  const todayKey = (() => {
+    const d = new Date();
+    const arg = new Date(d.getTime() - (3 * 60 * 60 * 1000));
+    return arg.toISOString().split('T')[0];
+  })();
+
   const totalRevenue = appointments.reduce((sum, a) => sum + (a.amount || 0), 0);
   const totalPaid = appointments.filter((a) => a.paid).reduce((sum, a) => sum + (a.amount || 0), 0);
 
@@ -129,51 +135,68 @@ export function CaroNailsWidget() {
               No hay turnos registrados para esta semana
             </div>
           ) : (
-            appointments.map((appt) => (
-              <div
-                key={appt.id}
-                className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-              >
-                <div className="min-w-0 flex-1 mr-3">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">
-                      {appt.clientNameSnapshot || 'Clienta'}
-                    </span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 uppercase font-mono">
-                      {formatDateLabel(appt.dayKey)}
-                    </span>
+            appointments.map((appt) => {
+              const isToday = appt.dayKey === todayKey;
+              const clientName = appt.clientNameSnapshot
+                ? appt.clientNameSnapshot.charAt(0).toUpperCase() + appt.clientNameSnapshot.slice(1)
+                : 'Clienta';
+
+              return (
+                <div
+                  key={appt.id}
+                  className={`flex items-center justify-between p-2.5 rounded-xl border transition-colors ${
+                    isToday
+                      ? 'border-pink-300/80 dark:border-pink-800/80 bg-pink-50/40 dark:bg-pink-950/20'
+                      : 'border-slate-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                  }`}
+                >
+                  <div className="min-w-0 flex-1 mr-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 truncate">
+                        {clientName}
+                      </span>
+                      {isToday ? (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-pink-500 text-white font-bold uppercase tracking-wider">
+                          HOY
+                        </span>
+                      ) : (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 capitalize font-medium">
+                          {formatDateLabel(appt.dayKey)}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                      <span className="flex items-center gap-1 font-medium">
+                        <Clock className="w-3 h-3 text-pink-500" />
+                        {formatTime(appt.startAt)}
+                      </span>
+                      {appt.description && (
+                        <>
+                          <span>•</span>
+                          <span className="truncate max-w-[120px] sm:max-w-[160px]">{appt.description}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 dark:text-slate-400">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-indigo-400" />
-                      {formatTime(appt.startAt)}
+                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                    <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
+                      {appt.amount > 0 ? `$${appt.amount.toLocaleString('es-AR')}` : '$0'}
                     </span>
-                    {appt.description && (
-                      <>
-                        <span>•</span>
-                        <span className="truncate max-w-[120px] sm:max-w-[160px]">{appt.description}</span>
-                      </>
+                    {appt.paid ? (
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                        <CheckCircle2 className="w-2.5 h-2.5" /> Pagado
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                        <AlertCircle className="w-2.5 h-2.5" /> Pendiente
+                      </span>
                     )}
                   </div>
                 </div>
-
-                <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                  <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
-                    ${appt.amount?.toLocaleString('es-AR')}
-                  </span>
-                  {appt.paid ? (
-                    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-                      <CheckCircle2 className="w-2.5 h-2.5" /> Pagado
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
-                      <AlertCircle className="w-2.5 h-2.5" /> Pendiente
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </CardContent>

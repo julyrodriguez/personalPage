@@ -4,7 +4,7 @@ export async function GET() {
   try {
     const apiUrl = process.env.API_VACAS_URL || 'https://apivacas.jariel.com.ar';
     const res = await fetch(`${apiUrl}/api/salon/appointments/week`, {
-      next: { revalidate: 60 }, // Revalidar cada 1 minuto
+      cache: 'no-store',
     });
 
     if (!res.ok) {
