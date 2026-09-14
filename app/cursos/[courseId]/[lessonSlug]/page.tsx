@@ -36,8 +36,12 @@ export default async function LessonPage({ params }: LessonPageProps) {
     notFound();
   }
 
-  // Update last visited lesson in the background
-  await db.setLastVisitedLesson(courseId, lessonSlug);
+  // Update last visited lesson safely in the background
+  try {
+    await db.setLastVisitedLesson(courseId, lessonSlug);
+  } catch (err) {
+    console.warn('Could not record last visited lesson:', err);
+  }
 
   // Find previous and next lessons
   const currentIndex = allLessonsMeta.findIndex((l) => l.lessonSlug === lessonSlug);

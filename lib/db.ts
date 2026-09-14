@@ -12,31 +12,43 @@ const PROGRESS_FILE = path.join(DATA_DIR, 'progress.json');
 const NEWS_FILE = path.join(DATA_DIR, 'news.json');
 
 function ensureDataDirectory() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+  } catch (err) {
+    // Ignore read-only FS errors
   }
 }
 
 function readJsonFile<T>(filePath: string, defaultData: T): T {
   ensureDataDirectory();
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2), 'utf-8');
-    return defaultData;
-  }
   try {
+    if (!fs.existsSync(filePath)) {
+      try {
+        fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2), 'utf-8');
+      } catch {
+        // Ignore read-only FS write error
+      }
+      return defaultData;
+    }
     const raw = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(raw) as T;
   } catch (error) {
-    console.error(`Error reading ${filePath}, restoring default:`, error);
+    console.warn(`Error reading ${filePath}, using fallback:`, error);
     return defaultData;
   }
 }
 
 function writeJsonFile<T>(filePath: string, data: T): void {
-  ensureDataDirectory();
-  const tempPath = `${filePath}.tmp.${Date.now()}`;
-  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf-8');
-  fs.renameSync(tempPath, filePath);
+  try {
+    ensureDataDirectory();
+    const tempPath = `${filePath}.tmp.${Date.now()}`;
+    fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf-8');
+    fs.renameSync(tempPath, filePath);
+  } catch (error) {
+    console.warn(`Could not write to ${filePath} (e.g. read-only filesystem):`, error);
+  }
 }
 
 // Initial Clean Data (Empty by default)

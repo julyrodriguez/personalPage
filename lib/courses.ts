@@ -29,27 +29,34 @@ const INITIAL_CATALOG: CourseCatalogItem[] = [
 ];
 
 export function getCoursesCatalog(): Record<string, CourseCatalogItem> {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-
-  if (!fs.existsSync(COURSES_FILE)) {
-    fs.writeFileSync(COURSES_FILE, JSON.stringify(INITIAL_CATALOG, null, 2), 'utf-8');
-    const map: Record<string, CourseCatalogItem> = {};
-    INITIAL_CATALOG.forEach((c) => (map[c.id] = c));
-    return map;
-  }
+  const map: Record<string, CourseCatalogItem> = {};
+  INITIAL_CATALOG.forEach((c) => (map[c.id] = c));
 
   try {
+    if (!fs.existsSync(DATA_DIR)) {
+      try {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      } catch {
+        // Read-only FS
+      }
+    }
+
+    if (!fs.existsSync(COURSES_FILE)) {
+      try {
+        fs.writeFileSync(COURSES_FILE, JSON.stringify(INITIAL_CATALOG, null, 2), 'utf-8');
+      } catch {
+        // Read-only FS
+      }
+      return map;
+    }
+
     const raw = fs.readFileSync(COURSES_FILE, 'utf-8');
     const list: CourseCatalogItem[] = JSON.parse(raw);
-    const map: Record<string, CourseCatalogItem> = {};
-    list.forEach((c) => (map[c.id] = c));
-    return map;
+    const parsedMap: Record<string, CourseCatalogItem> = {};
+    list.forEach((c) => (parsedMap[c.id] = c));
+    return parsedMap;
   } catch (error) {
-    console.error('Error reading courses.json, returning initial catalog:', error);
-    const map: Record<string, CourseCatalogItem> = {};
-    INITIAL_CATALOG.forEach((c) => (map[c.id] = c));
+    console.warn('Error reading courses.json, returning initial catalog:', error);
     return map;
   }
 }
@@ -64,20 +71,28 @@ export async function saveOrUpdateCourse(data: CourseCatalogItem): Promise<Cours
   };
 
   const list = Object.values(catalog);
-  fs.writeFileSync(COURSES_FILE, JSON.stringify(list, null, 2), 'utf-8');
+  try {
+    fs.writeFileSync(COURSES_FILE, JSON.stringify(list, null, 2), 'utf-8');
+  } catch (err) {
+    console.warn('Could not persist course update (read-only FS):', err);
+  }
   ensureCoursesDir(data.id);
   return catalog[data.id];
 }
 
 function ensureCoursesDir(courseId?: string) {
-  if (!fs.existsSync(COURSES_DIR)) {
-    fs.mkdirSync(COURSES_DIR, { recursive: true });
-  }
-  if (courseId) {
-    const coursePath = path.join(COURSES_DIR, courseId);
-    if (!fs.existsSync(coursePath)) {
-      fs.mkdirSync(coursePath, { recursive: true });
+  try {
+    if (!fs.existsSync(COURSES_DIR)) {
+      fs.mkdirSync(COURSES_DIR, { recursive: true });
     }
+    if (courseId) {
+      const coursePath = path.join(COURSES_DIR, courseId);
+      if (!fs.existsSync(coursePath)) {
+        fs.mkdirSync(coursePath, { recursive: true });
+      }
+    }
+  } catch (err) {
+    // Read-only filesystem, ignore
   }
 }
 

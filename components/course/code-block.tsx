@@ -4,14 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { Check, Copy, Code2 } from 'lucide-react';
 import Prism from 'prismjs';
 
-// Import required languages
-import 'prismjs/components/prism-sql';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-dax';
-import 'prismjs/components/prism-powerquery';
-import 'prismjs/components/prism-json';
-import 'prismjs/components/prism-bash';
+// Safe dynamic language grammar loaders
+const languageLoaders: Record<string, () => Promise<unknown>> = {
+  sql: () => import('prismjs/components/prism-sql'),
+  python: () => import('prismjs/components/prism-python'),
+  typescript: () => import('prismjs/components/prism-typescript'),
+  dax: () => import('prismjs/components/prism-dax'),
+  powerquery: () => import('prismjs/components/prism-powerquery'),
+  json: () => import('prismjs/components/prism-json'),
+  bash: () => import('prismjs/components/prism-bash'),
+};
 
 interface CodeBlockProps {
   language?: string;
@@ -65,21 +67,45 @@ export function CodeBlock({ language = 'text', code }: CodeBlockProps) {
     }
   };
 
-  // Run highlight
+  // Run highlight safely on client side
   const [highlightedHtml, setHighlightedHtml] = useState<string>('');
 
   useEffect(() => {
-    if (Prism.languages[normalizedLang]) {
-      const html = Prism.highlight(cleanCode, Prism.languages[normalizedLang], normalizedLang);
-      setHighlightedHtml(html);
-    } else {
-      setHighlightedHtml(
-        cleanCode
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-      );
-    }
+    let isMounted = true;
+
+    const highlightCode = async () => {
+      try {
+        if (typeof window !== 'undefined') {
+          (window as any).Prism = Prism;
+          (globalThis as any).Prism = Prism;
+        }
+
+        // Dynamically load language grammar if needed
+        if (languageLoaders[normalizedLang] && !Prism.languages[normalizedLang]) {
+          await languageLoaders[normalizedLang]();
+        }
+
+        if (isMounted) {
+          if (Prism.languages[normalizedLang]) {
+            const html = Prism.highlight(cleanCode, Prism.languages[normalizedLang], normalizedLang);
+            setHighlightedHtml(html);
+          } else {
+            setHighlightedHtml('');
+          }
+        }
+      } catch (err) {
+        console.warn('Prism highlighting fallback:', err);
+        if (isMounted) {
+          setHighlightedHtml('');
+        }
+      }
+    };
+
+    highlightCode();
+
+    return () => {
+      isMounted = false;
+    };
   }, [cleanCode, normalizedLang]);
 
   return (

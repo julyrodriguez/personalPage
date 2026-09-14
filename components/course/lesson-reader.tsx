@@ -22,7 +22,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CodeBlock } from './code-block';
 import { Lesson, LessonMeta } from '@/types';
-import confetti from 'canvas-confetti';
 
 interface LessonReaderProps {
   lesson: Lesson;
@@ -47,6 +46,7 @@ export function LessonReader({
 
     if (nextState) {
       try {
+        const confetti = (await import('canvas-confetti')).default;
         confetti({
           particleCount: 60,
           spread: 70,
