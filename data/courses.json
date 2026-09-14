@@ -1,0 +1,11 @@
+[
+  {
+    "id": "power-bi",
+    "title": "Power BI Masterclass: De Cero a Arquitecto Analítico",
+    "description": "Domina Power Query (M), Modelado Dimensional en Estrella, DAX avanzado con Inteligencia de Tiempo, RLS dinámico y Optimización VertiPaq.",
+    "category": "Business Intelligence & Data",
+    "level": "Avanzado",
+    "estimatedHours": 40,
+    "tags": ["Power BI", "DAX", "Power Query", "M", "Modelado Dimensional", "SQL"]
+  }
+]

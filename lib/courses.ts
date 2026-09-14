@@ -8,9 +8,16 @@ const COURSES_DIR = process.env.COURSES_DIR
   ? path.resolve(process.env.COURSES_DIR)
   : path.resolve(process.cwd(), 'content/courses');
 
-// Metadata registry for courses
-const COURSES_CATALOG: Record<string, Omit<Course, 'lessons' | 'lessonsCount' | 'completedCount' | 'progressPercentage'>> = {
-  'power-bi': {
+const DATA_DIR = process.env.DATA_DIR
+  ? path.resolve(process.env.DATA_DIR)
+  : path.join(process.cwd(), 'data');
+
+const COURSES_FILE = path.join(DATA_DIR, 'courses.json');
+
+type CourseCatalogItem = Omit<Course, 'lessons' | 'lessonsCount' | 'completedCount' | 'progressPercentage'>;
+
+const INITIAL_CATALOG: CourseCatalogItem[] = [
+  {
     id: 'power-bi',
     title: 'Power BI Masterclass: De Cero a Arquitecto Analítico',
     description: 'Domina Power Query (M), Modelado Dimensional en Estrella, DAX avanzado con Inteligencia de Tiempo, RLS dinámico y Optimización VertiPaq.',
@@ -19,7 +26,48 @@ const COURSES_CATALOG: Record<string, Omit<Course, 'lessons' | 'lessonsCount' | 
     estimatedHours: 40,
     tags: ['Power BI', 'DAX', 'Power Query', 'M', 'Modelado Dimensional', 'SQL'],
   },
-};
+];
+
+export function getCoursesCatalog(): Record<string, CourseCatalogItem> {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+
+  if (!fs.existsSync(COURSES_FILE)) {
+    fs.writeFileSync(COURSES_FILE, JSON.stringify(INITIAL_CATALOG, null, 2), 'utf-8');
+    const map: Record<string, CourseCatalogItem> = {};
+    INITIAL_CATALOG.forEach((c) => (map[c.id] = c));
+    return map;
+  }
+
+  try {
+    const raw = fs.readFileSync(COURSES_FILE, 'utf-8');
+    const list: CourseCatalogItem[] = JSON.parse(raw);
+    const map: Record<string, CourseCatalogItem> = {};
+    list.forEach((c) => (map[c.id] = c));
+    return map;
+  } catch (error) {
+    console.error('Error reading courses.json, returning initial catalog:', error);
+    const map: Record<string, CourseCatalogItem> = {};
+    INITIAL_CATALOG.forEach((c) => (map[c.id] = c));
+    return map;
+  }
+}
+
+export async function saveOrUpdateCourse(data: CourseCatalogItem): Promise<CourseCatalogItem> {
+  const catalog = getCoursesCatalog();
+  catalog[data.id] = {
+    ...data,
+    tags: Array.isArray(data.tags) ? data.tags : [],
+    estimatedHours: Number(data.estimatedHours) || 20,
+    level: data.level || 'Intermedio',
+  };
+
+  const list = Object.values(catalog);
+  fs.writeFileSync(COURSES_FILE, JSON.stringify(list, null, 2), 'utf-8');
+  ensureCoursesDir(data.id);
+  return catalog[data.id];
+}
 
 function ensureCoursesDir(courseId?: string) {
   if (!fs.existsSync(COURSES_DIR)) {
@@ -39,12 +87,13 @@ function ensureCoursesDir(courseId?: string) {
 export async function getAllCourses(): Promise<Course[]> {
   ensureCoursesDir();
   const allProgress = await db.getAllCourseProgress();
+  const catalog = getCoursesCatalog();
 
   const courses: Course[] = [];
-  const entries = Object.keys(COURSES_CATALOG);
+  const entries = Object.keys(catalog);
 
   for (const courseId of entries) {
-    const meta = COURSES_CATALOG[courseId];
+    const meta = catalog[courseId];
     const lessons = await getCourseLessonsMeta(courseId);
     const progress = allProgress[courseId];
     const completedCount = progress ? progress.completedLessons.length : 0;
@@ -68,7 +117,8 @@ export async function getAllCourses(): Promise<Course[]> {
  * Obtiene la información de un curso por ID.
  */
 export async function getCourseById(courseId: string): Promise<Course | null> {
-  const meta = COURSES_CATALOG[courseId];
+  const catalog = getCoursesCatalog();
+  const meta = catalog[courseId];
   if (!meta) return null;
 
   const lessons = await getCourseLessonsMeta(courseId);
