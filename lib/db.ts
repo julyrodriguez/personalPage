@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Task, Note, CourseProgress, TaskPriority, TaskStatus } from '@/types';
+import { Task, Note, CourseProgress, TaskPriority, TaskStatus, NewsArticle } from '@/types';
 
 const DATA_DIR = process.env.DATA_DIR
   ? path.resolve(process.env.DATA_DIR)
@@ -9,6 +9,7 @@ const DATA_DIR = process.env.DATA_DIR
 const TASKS_FILE = path.join(DATA_DIR, 'tasks.json');
 const NOTES_FILE = path.join(DATA_DIR, 'notes.json');
 const PROGRESS_FILE = path.join(DATA_DIR, 'progress.json');
+const NEWS_FILE = path.join(DATA_DIR, 'news.json');
 
 function ensureDataDirectory() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -42,6 +43,7 @@ function writeJsonFile<T>(filePath: string, data: T): void {
 const INITIAL_TASKS: Task[] = [];
 const INITIAL_NOTES: Note[] = [];
 const INITIAL_PROGRESS: Record<string, CourseProgress> = {};
+const INITIAL_NEWS: NewsArticle[] = [];
 
 // Database Adapter Interface
 export const db = {
@@ -216,5 +218,60 @@ export const db = {
     allProgress[courseId] = current;
     writeJsonFile(PROGRESS_FILE, allProgress);
     return current;
+  },
+
+  // NEWS ARTICLES
+  getNews: async (category?: string): Promise<NewsArticle[]> => {
+    const articles = readJsonFile<NewsArticle[]>(NEWS_FILE, INITIAL_NEWS);
+    if (category) {
+      return articles.filter((a) => a.category?.toLowerCase() === category.toLowerCase());
+    }
+    return articles;
+  },
+
+  getNewsById: async (id: string): Promise<NewsArticle | null> => {
+    const articles = readJsonFile<NewsArticle[]>(NEWS_FILE, INITIAL_NEWS);
+    return articles.find((a) => a.id === id) || null;
+  },
+
+  createNews: async (data: {
+    title: string;
+    content: string;
+    summary?: string;
+    source?: string;
+    url?: string;
+    imageUrl?: string;
+    category?: string;
+    tags?: string[];
+    important?: boolean;
+    publishedAt?: string;
+  }): Promise<NewsArticle> => {
+    const articles = readJsonFile<NewsArticle[]>(NEWS_FILE, INITIAL_NEWS);
+    const newArticle: NewsArticle = {
+      id: `news-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      title: data.title,
+      content: data.content,
+      summary: data.summary || '',
+      source: data.source || 'Agente AI',
+      url: data.url || '',
+      imageUrl: data.imageUrl || '',
+      category: data.category || 'General',
+      tags: data.tags || [],
+      important: data.important ?? true,
+      publishedAt: data.publishedAt || new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    articles.unshift(newArticle);
+    writeJsonFile(NEWS_FILE, articles);
+    return newArticle;
+  },
+
+  deleteNews: async (id: string): Promise<boolean> => {
+    const articles = readJsonFile<NewsArticle[]>(NEWS_FILE, INITIAL_NEWS);
+    const filtered = articles.filter((a) => a.id !== id);
+    if (filtered.length === articles.length) return false;
+    writeJsonFile(NEWS_FILE, filtered);
+    return true;
   },
 };

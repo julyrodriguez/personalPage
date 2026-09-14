@@ -3,6 +3,8 @@ import { WeatherWidget } from '@/components/dashboard/weather-widget';
 import { StudyProgressWidget } from '@/components/dashboard/study-progress-widget';
 import { TaskWidget } from '@/components/dashboard/task-widget';
 import { NotesWidget } from '@/components/dashboard/notes-widget';
+import { CaroNailsWidget } from '@/components/dashboard/caro-nails-widget';
+import { NewsWidget } from '@/components/dashboard/news-widget';
 
 export const metadata = {
   title: 'Dashboard Principal | Personal OS',
@@ -35,6 +37,16 @@ export default function DashboardPage() {
         {/* Notes & Bitácora Widget (1 col) */}
         <div className="lg:col-span-1">
           <NotesWidget />
+        </div>
+
+        {/* Caro Nails Weekly Appointments Widget (1 col) */}
+        <div className="lg:col-span-1">
+          <CaroNailsWidget />
+        </div>
+
+        {/* News & Important Articles Widget (2 cols on lg) */}
+        <div className="md:col-span-2 lg:col-span-2">
+          <NewsWidget />
         </div>
       </div>
     </div>

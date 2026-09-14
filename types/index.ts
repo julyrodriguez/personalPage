@@ -86,3 +86,31 @@ export interface WeatherData {
   daily: DailyWeather[];
   cachedAt?: string;
 }
+
+export interface NewsArticle {
+  id: string;
+  title: string;
+  content: string; // Artículo completo en Markdown
+  summary?: string;
+  source?: string;
+  url?: string;
+  imageUrl?: string;
+  category?: string;
+  tags?: string[];
+  important?: boolean;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SalonAppointment {
+  id: string;
+  clientNameSnapshot: string;
+  clientId?: string;
+  dayKey: string; // YYYY-MM-DD
+  startAt: string;
+  amount: number;
+  paid: boolean;
+  description?: string;
+  canceled?: boolean;
+}

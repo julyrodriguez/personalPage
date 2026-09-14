@@ -14,6 +14,7 @@ import {
   Sparkles,
   ChevronRight,
   LogOut,
+  Newspaper,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -43,6 +44,12 @@ const NAV_ITEMS = [
     href: '/notas',
     icon: FileText,
     description: 'Bitácora & Cheat Sheets',
+  },
+  {
+    name: 'Noticias',
+    href: '/noticias',
+    icon: Newspaper,
+    description: 'Artículos & Curaduría AI',
   },
 ];
 
