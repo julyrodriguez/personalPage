@@ -1,5 +1,62 @@
 [
   {
+    "id": "news-1789421904779-ehc33",
+    "title": "Lanzamiento oficial de Linux Kernel 6.12 con soporte crítico para arquitecturas ARM y de tiempo real",
+    "content": "## Resumen Completo\n\nLa fundación Linux anunció la disponibilidad general de la versión 6.12 de su kernel, un lanzamiento largamente esperado por la comunidad de infraestructura y sistemas operativos. Entre sus novedades más destacadas se encuentra la fusión del código para la programación de tareas en tiempo real, permitiendo una latencia predecible crucial para aplicaciones industriales y de telecomunicaciones.\n\nAdemás, se han incorporado mejoras sustanciales en la gestión de energía para procesadores ARM y optimizaciones en el subsistema de memoria para arquitecturas x86_64 modernas. Estas mejoras consolidan la posición de Linux como el sistema operativo dominante en la nube y en la nueva generación de dispositivos edge computing.\n\n### Puntos clave\n- Integración formal del parche PREEMPT_RT para tiempo real.\n- Mejoras de rendimiento y eficiencia energética en procesadores ARM.\n- Actualizaciones mayores en controladores de hardware y seguridad.",
+    "summary": "La comunidad de código abierto ha liberado la última versión del núcleo de Linux, destacándose por la integración nativa de capacidades de ejecución determinista. Esta actualización optimiza el rendimiento en centros de datos de alta densidad y sistemas embebidos.",
+    "source": "Ars Technica",
+    "url": "https://arstechnica.com",
+    "imageUrl": "",
+    "category": "Tecnología",
+    "tags": [
+      "linux",
+      "kernel",
+      "infraestructura"
+    ],
+    "important": false,
+    "publishedAt": "2026-09-14T21:38:24.779Z",
+    "createdAt": "2026-09-14T21:38:24.779Z",
+    "updatedAt": "2026-09-14T21:38:24.779Z"
+  },
+  {
+    "id": "news-1789421904688-50dqk",
+    "title": "OpenAI y Google presentan nuevos avances en razonamiento multi-agente para LLM",
+    "content": "## Resumen Completo\n\nEn un nuevo hito para la industria tecnológica, los desarrolladores líderes han comenzado a desplegar paradigmas donde múltiples instancias de modelos de lenguaje grande (LLM) interactúan como agentes especializados. Cada agente asume roles específicos como crítico, programador o investigador, validando iterativamente sus resultados antes de presentarlos al usuario final.\n\nEste enfoque marca un cambio de paradigma desde los chatbots conversacionales tradicionales hacia sistemas autónomos de resolución de tareas complejas. Las empresas ya están integrando estas capacidades en entornos de desarrollo empresarial, optimizando flujos de trabajo en ingeniería de software y análisis de datos avanzados.\n\n### Puntos clave\n- Implementación de arquitecturas de agentes autónomos colaborativos.\n- Reducción significativa en las tasas de error y respuestas alucinatorias.\n- Mayor aplicabilidad en flujos de trabajo de ingeniería de software.",
+    "summary": "Los principales laboratorios de inteligencia artificial revelaron arquitecturas de modelos capaces de colaborar en red para resolver problemas complejos de programación y lógica. Esta evolución reduce drásticamente las alucinaciones y mejora la precisión en un 40%.",
+    "source": "TechCrunch",
+    "url": "https://techcrunch.com",
+    "imageUrl": "",
+    "category": "Inteligencia Artificial",
+    "tags": [
+      "ia",
+      "llm",
+      "openai"
+    ],
+    "important": true,
+    "publishedAt": "2026-09-14T21:38:24.687Z",
+    "createdAt": "2026-09-14T21:38:24.688Z",
+    "updatedAt": "2026-09-14T21:38:24.688Z"
+  },
+  {
+    "id": "news-1789421904165-itxdb",
+    "title": "El Gobierno anuncia nuevas medidas fiscales para contener la inflación",
+    "content": "## Resumen Completo\n\nEl equipo económico del Gobierno nacional anunció este martes un conjunto de políticas fiscales y monetarias destinadas a mantener la estabilidad cambiaria y profundizar la baja de la inflación registrada en los últimos meses. Las medidas incluyen un endurecimiento del gasto público y nuevos incentivos para la liquidación de exportaciones en sectores estratégicos.\n\nEspecialistas y analistas financieros evaluaron el impacto de estas decisiones en un contexto de alta sensibilidad social y comercial. Mientras que algunos sectores destacan la necesidad de anclar las expectativas, otros advierten sobre el riesgo de enfriar el consumo interno y desacelerar la recuperación de la actividad económica general.\n\n### Puntos clave\n- Refuerzo del ajuste fiscal para alcanzar el equilibrio financiero.\n- Nuevos incentivos para la acumulación de reservas internacionales.\n- Monitoreo estricto de precios en bienes de la canasta básica.",
+    "summary": "El Ministerio de Economía implementó un nuevo paquete de medidas orientado a fortalecer las reservas y desacelerar el ritmo inflacionario mensual. La decisión generó diversas reacciones en los mercados locales y las cámaras empresariales.",
+    "source": "La Nación",
+    "url": "https://www.lanacion.com.ar",
+    "imageUrl": "",
+    "category": "Nacional",
+    "tags": [
+      "economia",
+      "inflacion",
+      "argentina"
+    ],
+    "important": true,
+    "publishedAt": "2026-09-14T21:38:24.164Z",
+    "createdAt": "2026-09-14T21:38:24.165Z",
+    "updatedAt": "2026-09-14T21:38:24.165Z"
+  },
+  {
     "id": "news-1789421854211-mwnq5",
     "title": "Lanzan la primera especificación global para infraestructura de centros de datos cuánticos",
     "content": "## Resumen Completo\n\nUn grupo compuesto por líderes de la industria de semiconductores y proveedores de nube anunció la estandarización de protocolos para la próxima generación de centros de datos. La iniciativa responde a la creciente necesidad de preparar las instalaciones actuales para soportar cargas de trabajo híbridas que combinen procesadores clásicos y Qubits.\n\nEl documento técnico detalla los requerimientos energéticos, de seguridad criptográfica post-cuántica y de gestión térmica extrema necesarios para operar estos sistemas sin interrupciones. Se espera que las primeras implementaciones comerciales bajo este estándar comiencen a desplegarse hacia finales del próximo año.\n\n### Puntos clave\n- Estandarización de interfaces de hardware criogénico.\n- Protocolos de seguridad adaptados a la era post-cuántica.\n- Lineamientos de eficiencia energética para refrigeración avanzada.",

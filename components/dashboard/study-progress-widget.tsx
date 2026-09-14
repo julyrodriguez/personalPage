@@ -117,16 +117,30 @@ export function StudyProgressWidget() {
           </div>
         </div>
 
-        {/* Action Button */}
-        <Link href="/cursos/power-bi" className="block pt-1">
-          <Button
-            size="sm"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs text-xs h-8 rounded-xl flex items-center justify-center gap-1.5"
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          <Link href="/cursos/power-bi" className="block">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full text-xs h-8 rounded-xl hover:bg-indigo-50 dark:hover:bg-slate-800"
+            >
+              Ver Temario
+            </Button>
+          </Link>
+          <Link
+            href="/cursos/power-bi/01-fundamentos-power-bi"
+            className="block"
           >
-            <span>Ir al Curso & Temario</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Button>
-        </Link>
+            <Button
+              size="sm"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs text-xs h-8 rounded-xl flex items-center justify-center gap-1"
+            >
+              <span>{completed > 0 ? 'Continuar' : 'Iniciar'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );
