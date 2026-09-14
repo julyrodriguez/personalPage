@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "id": "news-1789421854211-mwnq5",
+    "title": "Lanzan la primera especificación global para infraestructura de centros de datos cuánticos",
+    "content": "## Resumen Completo\n\nUn grupo compuesto por líderes de la industria de semiconductores y proveedores de nube anunció la estandarización de protocolos para la próxima generación de centros de datos. La iniciativa responde a la creciente necesidad de preparar las instalaciones actuales para soportar cargas de trabajo híbridas que combinen procesadores clásicos y Qubits.\n\nEl documento técnico detalla los requerimientos energéticos, de seguridad criptográfica post-cuántica y de gestión térmica extrema necesarios para operar estos sistemas sin interrupciones. Se espera que las primeras implementaciones comerciales bajo este estándar comiencen a desplegarse hacia finales del próximo año.\n\n### Puntos clave\n- Estandarización de interfaces de hardware criogénico.\n- Protocolos de seguridad adaptados a la era post-cuántica.\n- Lineamientos de eficiencia energética para refrigeración avanzada.",
+    "summary": "Un consorcio internacional de gigantes tecnológicos publicó los primeros estándares de infraestructura para integrar computación cuántica con nubes híbridas. Este marco busca estandarizar la conectividad y la refrigeración criogénica a escala industrial.",
+    "source": "The Verge",
+    "url": "https://www.theverge.com",
+    "imageUrl": "",
+    "category": "Tecnología",
+    "tags": [
+      "hardware",
+      "cloud",
+      "infraestructura",
+      "computacion"
+    ],
+    "important": false,
+    "publishedAt": "2026-09-14T21:37:34.211Z",
+    "createdAt": "2026-09-14T21:37:34.211Z",
+    "updatedAt": "2026-09-14T21:37:34.211Z"
+  },
+  {
+    "id": "news-1789421854119-l95fj",
+    "title": "OpenAI presenta avances revolucionarios en razonamiento para modelos LLM",
+    "content": "## Resumen Completo\n\nEn un evento transmitido para desarrolladores de todo el mundo, OpenAI demostró la nueva generación de arquitecturas orientadas a mejorar la lógica interna de los modelos de inteligencia artificial. A través de un proceso de entrenamiento por refuerzo mejorado, el sistema ahora puede 'pensar' antes de responder, simulando cadenas de pensamiento complejas.\n\nEste avance marca un antes y un después en la aplicación industrial de los LLM, facilitando su adopción en sectores críticos como la medicina, la investigación científica y la ingeniería de software avanzada. Los expertos destacan que este enfoque reduce significativamente los errores lógicos característicos de versiones anteriores.\n\n### Puntos clave\n- Incorporación de cadenas de pensamiento verificables en las respuestas.\n- Reducción del 70% en tasas de alucinación en pruebas de benchmarking.\n- Disponibilidad inicial para desarrolladores a través de API dedicada.",
+    "summary": "La compañía tecnológica introdujo nuevas capacidades de razonamiento en tiempo real para sus modelos de lenguaje, reduciendo drásticamente las alucinaciones. Esta evolución permite a la inteligencia artificial resolver problemas matemáticos y de programación complejos con alta precisión.",
+    "source": "TechCrunch",
+    "url": "https://techcrunch.com",
+    "imageUrl": "",
+    "category": "Inteligencia Artificial",
+    "tags": [
+      "ia",
+      "openai",
+      "llm",
+      "desarrollo"
+    ],
+    "important": true,
+    "publishedAt": "2026-09-14T21:37:34.118Z",
+    "createdAt": "2026-09-14T21:37:34.119Z",
+    "updatedAt": "2026-09-14T21:37:34.119Z"
+  },
+  {
+    "id": "news-1789421853674-atho4",
+    "title": "El Gobierno anuncia nuevas medidas fiscales para contener la inflación",
+    "content": "## Resumen Completo\n\nEl equipo económico del Gobierno nacional oficializó este martes un conjunto de normativas orientadas a profundizar el ajuste fiscal y mantener ancladas las expectativas de inflación. Estas medidas llegan en un momento clave de negociaciones con organismos internacionales y de revisión de metas macroeconómicas.\n\nEspecialistas del sector financiero han señalado que la sostenibilidad de estas políticas dependerá fundamentalmente de la capacidad de ejecución y del respaldo político en el Congreso. Mientras tanto, los mercados reaccionaron con cautela ante el anuncio de las nuevas restricciones y metas de acumulación de reservas.\n\n### Puntos clave\n- Reducción adicional de partidas presupuestarias en empresas estatales.\n- Ratificación de la meta de equilibrio fiscal para el cierre del ejercicio.\n- Nuevos incentivos para la liquidación de exportaciones del agro.",
+    "summary": "El Ministerio de Economía implementó un nuevo paquete de medidas económicas enfocado en la reducción del gasto público y la estabilización cambiaria. Las disposiciones buscan consolidar la baja mensual del índice de precios al consumidor.",
+    "source": "La Nación",
+    "url": "https://www.lanacion.com.ar",
+    "imageUrl": "",
+    "category": "Nacional",
+    "tags": [
+      "economia",
+      "inflacion",
+      "argentina",
+      "gobierno"
+    ],
+    "important": true,
+    "publishedAt": "2026-09-14T21:37:33.672Z",
+    "createdAt": "2026-09-14T21:37:33.674Z",
+    "updatedAt": "2026-09-14T21:37:33.674Z"
+  }
+]
