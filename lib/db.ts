@@ -2,7 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import { Task, Note, CourseProgress, TaskPriority, TaskStatus } from '@/types';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+const DATA_DIR = process.env.DATA_DIR
+  ? path.resolve(process.env.DATA_DIR)
+  : path.join(process.cwd(), 'data');
 
 const TASKS_FILE = path.join(DATA_DIR, 'tasks.json');
 const NOTES_FILE = path.join(DATA_DIR, 'notes.json');

@@ -4,7 +4,9 @@ import matter from 'gray-matter';
 import { Course, Lesson, LessonMeta } from '@/types';
 import { db } from './db';
 
-const COURSES_DIR = path.resolve(process.cwd(), 'content/courses');
+const COURSES_DIR = process.env.COURSES_DIR
+  ? path.resolve(process.env.COURSES_DIR)
+  : path.resolve(process.cwd(), 'content/courses');
 
 // Metadata registry for courses
 const COURSES_CATALOG: Record<string, Omit<Course, 'lessons' | 'lessonsCount' | 'completedCount' | 'progressPercentage'>> = {
