@@ -33,6 +33,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { WebTerminal } from '@/components/server/web-terminal';
 
 interface ServerStatusData {
   success: boolean;
@@ -733,7 +734,27 @@ export default function ServidorPage() {
         </div>
       </div>
 
-      {/* SECTION 3: PM2 PROCESSES */}
+      {/* SECTION 3: WEB TERMINAL INTERACTIVA (EN EL CENTRO) */}
+      <div>
+        <div className="flex items-center justify-between mb-3 px-1">
+          <div className="flex items-center gap-2">
+            <Terminal className="w-4 h-4 text-cyan-500" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">
+              Consola Interactiva en Vivo (Web Terminal)
+            </h2>
+            <Badge variant="outline" className="text-[10px] font-mono px-2 py-0 border-cyan-500/30 text-cyan-600 dark:text-cyan-400">
+              SSH PTY
+            </Badge>
+          </div>
+          <span className="text-xs text-slate-400 font-mono hidden sm:inline">
+            Sesión Bash interactiva con usuario julian
+          </span>
+        </div>
+
+        <WebTerminal />
+      </div>
+
+      {/* SECTION 4: PM2 PROCESSES */}
       <Card className="border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/90 shadow-sm overflow-hidden">
         <CardHeader className="p-4 sm:p-5 pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div className="flex items-center gap-2">
