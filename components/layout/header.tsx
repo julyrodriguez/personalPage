@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Calendar,
   Clock,
@@ -17,6 +18,9 @@ import {
   CloudFog,
   MapPin,
   RefreshCw,
+  Cpu,
+  Zap,
+  Thermometer,
 } from 'lucide-react';
 import { WeatherData } from '@/types';
 
@@ -70,6 +74,33 @@ export function Header() {
   const [currentTime, setCurrentTime] = useState('');
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [refreshingWeather, setRefreshingWeather] = useState(false);
+  const [serverTelemetry, setServerTelemetry] = useState<{
+    cpuUsage?: number;
+    watts?: number;
+    tempC?: number;
+  } | null>(null);
+
+  const loadServerTelemetry = async () => {
+    try {
+      const res = await fetch('/api/server-status');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setServerTelemetry({
+            cpuUsage: json.cpu?.usagePercent,
+            watts: json.energy?.systemEstWatts,
+            tempC: json.energy?.tempC,
+          });
+        }
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    loadServerTelemetry();
+    const interval = setInterval(loadServerTelemetry, 25000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -154,7 +185,47 @@ export function Header() {
         </div>
       </div>
 
-      {/* 2. Clima Actual + Pronóstico 2 Días */}
+      {/* 2. Telemetría Rápida de Servidor (CPU, Watts & Temp) */}
+      {serverTelemetry && (
+        <Link
+          href="/servidor"
+          className="flex items-center gap-3 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 hover:border-cyan-500/40 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group shrink-0"
+          title="Ver centro de control del servidor y terminal"
+        >
+          {/* CPU */}
+          <div className="flex items-center gap-1.5 text-xs font-mono">
+            <Cpu className="w-3.5 h-3.5 text-cyan-500 group-hover:scale-110 transition-transform" />
+            <span className="font-bold text-slate-700 dark:text-slate-200">
+              {serverTelemetry.cpuUsage ?? 0}%
+            </span>
+          </div>
+
+          <span className="h-3.5 w-px bg-slate-200 dark:bg-slate-700" />
+
+          {/* Consumo Eléctrico Watts */}
+          <div className="flex items-center gap-1.5 text-xs font-mono">
+            <Zap className="w-3.5 h-3.5 text-amber-500 group-hover:scale-110 transition-transform" />
+            <span className="font-bold text-slate-700 dark:text-slate-200">
+              {serverTelemetry.watts ?? '--'}W
+            </span>
+          </div>
+
+          {/* Temperatura */}
+          {serverTelemetry.tempC && (
+            <>
+              <span className="h-3.5 w-px bg-slate-200 dark:bg-slate-700" />
+              <div className="flex items-center gap-1 text-xs font-mono">
+                <Thermometer className="w-3.5 h-3.5 text-rose-400 group-hover:scale-110 transition-transform" />
+                <span className="font-bold text-slate-700 dark:text-slate-200">
+                  {serverTelemetry.tempC}°C
+                </span>
+              </div>
+            </>
+          )}
+        </Link>
+      )}
+
+      {/* 3. Clima Actual + Pronóstico 2 Días */}
       <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap lg:justify-end border-t lg:border-t-0 pt-2.5 lg:pt-0 border-slate-100 dark:border-slate-800/80">
         {/* Clima Actual */}
         <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">

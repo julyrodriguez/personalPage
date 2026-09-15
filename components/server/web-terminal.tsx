@@ -22,6 +22,7 @@ interface WebTerminalProps {
 }
 
 const QUICK_COMMANDS = [
+  { label: 'Ctrl + C', cmd: '\x03', desc: 'Cancelar / Interrumpir proceso activo (SIGINT)' },
   { label: 'pm2 status', cmd: 'pm2 status\n', desc: 'Ver estado de servicios' },
   { label: 'pm2 logs', cmd: 'pm2 logs --lines 25 --nostream\n', desc: 'Últimas 25 líneas de logs' },
   { label: 'htop', cmd: 'htop\n', desc: 'Monitor de procesos en vivo' },
@@ -337,17 +338,24 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
           <span>Atajos:</span>
         </div>
 
-        {QUICK_COMMANDS.map((item) => (
-          <button
-            key={item.label}
-            onClick={() => sendQuickCommand(item.cmd)}
-            disabled={status !== 'connected'}
-            className="px-2 py-0.5 rounded-md font-mono text-[11px] text-slate-300 hover:text-cyan-300 bg-slate-800/70 hover:bg-slate-800 border border-slate-700/50 transition-colors shrink-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-            title={item.desc}
-          >
-            <span>{item.label}</span>
-          </button>
-        ))}
+        {QUICK_COMMANDS.map((item) => {
+          const isCtrlC = item.label === 'Ctrl + C';
+          return (
+            <button
+              key={item.label}
+              onClick={() => sendQuickCommand(item.cmd)}
+              disabled={status !== 'connected'}
+              className={`px-2.5 py-0.5 rounded-md font-mono text-[11px] transition-all shrink-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 ${
+                isCtrlC
+                  ? 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/50 font-bold shadow-xs'
+                  : 'text-slate-300 hover:text-cyan-300 bg-slate-800/70 hover:bg-slate-800 border border-slate-700/50'
+              }`}
+              title={item.desc}
+            >
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Error alert banner if disconnected */}

@@ -4,7 +4,6 @@ import { TaskWidget } from '@/components/dashboard/task-widget';
 import { CaroNailsWidget } from '@/components/dashboard/caro-nails-widget';
 import { NotesWidget } from '@/components/dashboard/notes-widget';
 import { StudyProgressWidget } from '@/components/dashboard/study-progress-widget';
-import { ServerStatusWidget } from '@/components/dashboard/server-status-widget';
 
 export const metadata = {
   title: 'Dashboard Principal | Personal OS',
@@ -14,7 +13,7 @@ export const metadata = {
 export default function DashboardPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      {/* 1. Header con Fecha, Hora en vivo, Clima actual y Pronóstico de 2 días */}
+      {/* 1. Header con Fecha, Hora en vivo, Clima actual y Telemetría de Servidor */}
       <Header />
 
       {/* 2. Portada de Noticias & Artículos Destacados */}
@@ -38,9 +37,6 @@ export default function DashboardPage() {
           <NotesWidget />
         </div>
       </div>
-
-      {/* 4. Monitor de Servidor VPS & PM2 (CPU, RAM, Disco, Logs en tiempo real) */}
-      <ServerStatusWidget />
     </div>
   );
 }

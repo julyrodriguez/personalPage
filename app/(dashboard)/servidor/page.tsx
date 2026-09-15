@@ -28,6 +28,8 @@ import {
   ExternalLink,
   ChevronDown,
   Filter,
+  Lock,
+  KeyRound,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -105,6 +107,66 @@ export default function ServidorPage() {
   const [secondsLeft, setSecondsLeft] = useState(20);
   const [error, setError] = useState<string | null>(null);
 
+  // PIN Protection States
+  const [isUnlocked, setIsUnlocked] = useState<boolean | null>(null);
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [pinLoading, setPinLoading] = useState(false);
+
+  // Check PIN session on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/servidor/verify-pin');
+        if (res.ok) {
+          const json = await res.json();
+          setIsUnlocked(json.unlocked === true);
+        } else {
+          setIsUnlocked(false);
+        }
+      } catch {
+        setIsUnlocked(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const handlePinSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pinInput.trim()) return;
+
+    setPinLoading(true);
+    setPinError(null);
+
+    try {
+      const res = await fetch('/api/servidor/verify-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: pinInput.trim() }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsUnlocked(true);
+        setPinError(null);
+        setPinInput('');
+      } else {
+        setPinError(data.error || 'PIN incorrecto. Reintenta.');
+      }
+    } catch {
+      setPinError('Error al conectar con el servidor.');
+    } finally {
+      setPinLoading(false);
+    }
+  };
+
+  const handleLockServer = async () => {
+    try {
+      await fetch('/api/servidor/verify-pin', { method: 'DELETE' });
+    } catch {}
+    setIsUnlocked(false);
+  };
+
   // PC Remote Control States
   const [powerActionLoading, setPowerActionLoading] = useState<'prender' | 'apagar' | null>(null);
   const [powerFeedback, setPowerFeedback] = useState<{
@@ -146,6 +208,7 @@ export default function ServidorPage() {
 
   // Polling loop
   useEffect(() => {
+    if (!isUnlocked) return;
     fetchStatus();
 
     const timer = setInterval(() => {
@@ -173,7 +236,7 @@ export default function ServidorPage() {
       clearInterval(timer);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [fetchStatus]);
+  }, [fetchStatus, isUnlocked]);
 
   // Handle PC Remote Control (Prender / Apagar)
   const handlePcPowerAction = async (action: 'prender' | 'apagar') => {
@@ -294,6 +357,76 @@ export default function ServidorPage() {
     return `${minutes}m`;
   };
 
+  // Pantalla de bloqueo si no está autenticado con el PIN
+  if (isUnlocked === false || isUnlocked === null) {
+    return (
+      <div className="min-h-[65vh] flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+          {/* Glow decorativo */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <CardHeader className="p-6 pb-4 text-center relative z-10">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white flex items-center justify-center mx-auto mb-3 shadow-lg shadow-blue-500/30">
+              <Lock className="w-7 h-7" />
+            </div>
+            <CardTitle className="text-xl font-bold text-slate-900 dark:text-white">
+              Servidor & Control Protegido
+            </CardTitle>
+            <CardDescription className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 max-w-xs mx-auto">
+              Ingresa el PIN de seguridad configurado en Vercel (<code className="text-blue-500 font-mono font-semibold">SERVER_ACCESS_PIN</code>) para acceder al panel y a la Web Terminal.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="p-6 pt-0 relative z-10">
+            <form onSubmit={handlePinSubmit} className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={10}
+                  autoFocus
+                  placeholder="PIN de acceso (ej. 2001)"
+                  value={pinInput}
+                  onChange={(e) => {
+                    setPinInput(e.target.value);
+                    if (pinError) setPinError(null);
+                  }}
+                  className={`w-full px-4 py-3 text-center text-lg font-mono tracking-widest rounded-xl bg-slate-50 dark:bg-slate-800/80 border focus:outline-none transition-all ${
+                    pinError
+                      ? 'border-rose-500 focus:border-rose-500 text-rose-500 bg-rose-500/5'
+                      : 'border-slate-200 dark:border-slate-700 focus:border-blue-500 text-slate-900 dark:text-white'
+                  }`}
+                />
+
+                {pinError && (
+                  <p className="text-xs text-rose-500 mt-2 text-center font-medium flex items-center justify-center gap-1.5 animate-in fade-in duration-200">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{pinError}</span>
+                  </p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={pinLoading || !pinInput.trim()}
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl shadow-md shadow-blue-500/20 cursor-pointer gap-2 text-sm"
+              >
+                {pinLoading ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <KeyRound className="w-4 h-4" />
+                )}
+                <span>{pinLoading ? 'Verificando...' : 'Desbloquear Servidor'}</span>
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 pb-12">
       {/* Page Header */}
@@ -319,7 +452,7 @@ export default function ServidorPage() {
           </p>
         </div>
 
-        {/* Refresh button & countdown */}
+        {/* Refresh button, countdown & lock button */}
         <div className="flex items-center gap-2.5">
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-xs text-slate-500 dark:text-slate-400 font-mono">
             <Clock className="w-3.5 h-3.5 text-slate-400" />
@@ -335,6 +468,17 @@ export default function ServidorPage() {
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-blue-500' : ''}`} />
             <span>{refreshing ? 'Actualizando...' : 'Refrescar'}</span>
+          </Button>
+
+          <Button
+            onClick={handleLockServer}
+            size="sm"
+            variant="outline"
+            className="rounded-xl border-slate-200 dark:border-slate-700 gap-1.5 text-xs text-slate-500 hover:text-rose-500 hover:border-rose-500/40 cursor-pointer"
+            title="Bloquear acceso a la pestaña"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Bloquear</span>
           </Button>
         </div>
       </div>
