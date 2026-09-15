@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge';
 
 interface WebTerminalProps {
   className?: string;
+  defaultOpen?: boolean;
 }
 
 interface TerminalSession {
@@ -45,7 +46,7 @@ const QUICK_COMMANDS = [
   { label: 'top', cmd: 'top\n', desc: 'Monitor de procesos top' },
 ];
 
-export function WebTerminal({ className = '' }: WebTerminalProps) {
+export function WebTerminal({ className = '', defaultOpen = false }: WebTerminalProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const termInstanceRef = useRef<any>(null);
@@ -56,6 +57,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
   const isMountedRef = useRef<boolean>(true);
   const touchCleanupRef = useRef<(() => void) | null>(null);
 
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const [sessions, setSessions] = useState<TerminalSession[]>(DEFAULT_SESSIONS);
   const [activeSessionId, setActiveSessionId] = useState<string>('personal-1');
   const activeSessionIdRef = useRef<string>('personal-1');
@@ -320,8 +322,10 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
     }
   }, []);
 
-  // Inicializar al montar y gestionar reconexión al volver de otra app (ej. WhatsApp)
+  // Inicializar al abrir y gestionar reconexión al volver de otra app (ej. WhatsApp)
   useEffect(() => {
+    if (!isOpen) return;
+
     isMountedRef.current = true;
     connectTerminal(activeSessionIdRef.current);
 
@@ -382,7 +386,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
         } catch (e) {}
       }
     };
-  }, [connectTerminal]);
+  }, [isOpen, connectTerminal]);
 
   // Bloquear scroll de la página cuando la terminal está en pantalla completa
   useEffect(() => {
@@ -545,6 +549,41 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
     }
   };
 
+  if (!isOpen) {
+    return (
+      <div
+        className={`rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-[#070b14]/70 p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 backdrop-blur-xs ${className}`}
+      >
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-cyan-500/10 dark:bg-cyan-500/15 border border-cyan-500/25 flex items-center justify-center text-cyan-500 shrink-0 shadow-xs">
+            <TerminalIcon className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                Consola Interactiva en Vivo
+              </h3>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-400 font-mono font-semibold border border-blue-500/25">
+                tmux persistente
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Terminal remota interactiva con soporte para múltiples pestañas y persistencia de procesos en segundo plano.
+            </p>
+          </div>
+        </div>
+
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs px-4 py-2 rounded-xl shadow-md shadow-cyan-600/20 flex items-center gap-2 cursor-pointer w-full sm:w-auto shrink-0 transition-all active:scale-95"
+        >
+          <Play className="w-3.5 h-3.5 fill-current" />
+          <span>Abrir Terminal</span>
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`transition-all duration-200 ${
@@ -654,6 +693,21 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
             title={isFullscreen ? 'Salir de pantalla completa (ESC)' : 'Pantalla completa'}
           >
             {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+          </Button>
+
+          {/* Close/Hide Terminal Button */}
+          <Button
+            onClick={() => {
+              if (wsRef.current) wsRef.current.close();
+              setIsFullscreen(false);
+              setIsOpen(false);
+            }}
+            size="sm"
+            variant="ghost"
+            className="h-7 text-xs text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 px-2 rounded-lg cursor-pointer"
+            title="Ocultar consola (tus procesos siguen corriendo en segundo plano)"
+          >
+            <X className="w-3.5 h-3.5" />
           </Button>
         </div>
       </div>
