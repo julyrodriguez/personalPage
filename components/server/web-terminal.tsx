@@ -24,13 +24,9 @@ interface WebTerminalProps {
 
 const QUICK_COMMANDS = [
   { label: 'Ctrl + C', cmd: '\x03', desc: 'Cancelar / Interrumpir proceso activo (SIGINT)' },
-  { label: 'pm2 status', cmd: 'pm2 status\n', desc: 'Ver estado de servicios' },
-  { label: 'pm2 logs', cmd: 'pm2 logs --lines 25 --nostream\n', desc: 'Últimas 25 líneas de logs' },
-  { label: 'htop', cmd: 'htop\n', desc: 'Monitor de procesos en vivo' },
-  { label: 'espacio (df -h)', cmd: 'df -h /\n', desc: 'Espacio en disco SSD' },
-  { label: 'memoria (free -m)', cmd: 'free -h\n', desc: 'Memoria RAM y Swap' },
-  { label: 'uptime & load', cmd: 'uptime\n', desc: 'Tiempo activo y carga' },
-  { label: 'git status', cmd: 'git status\n', desc: 'Estado de git en personal' },
+  { label: 'Ctrl + O', cmd: '\x0f', desc: 'Atajo Ctrl + O' },
+  { label: 'pm2 status', cmd: 'pm2 status\n', desc: 'Ver estado de servicios PM2' },
+  { label: 'top', cmd: 'top\n', desc: 'Monitor de procesos top' },
 ];
 
 export function WebTerminal({ className = '' }: WebTerminalProps) {
@@ -427,6 +423,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
 
         {QUICK_COMMANDS.map((item) => {
           const isCtrlC = item.label === 'Ctrl + C';
+          const isCtrlO = item.label === 'Ctrl + O';
           return (
             <button
               key={item.label}
@@ -435,6 +432,8 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
               className={`px-2.5 py-0.5 rounded-md font-mono text-[11px] transition-all shrink-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 ${
                 isCtrlC
                   ? 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/50 font-bold shadow-xs'
+                  : isCtrlO
+                  ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/50 font-bold shadow-xs'
                   : 'text-slate-300 hover:text-cyan-300 bg-slate-800/70 hover:bg-slate-800 border border-slate-700/50'
               }`}
               title={item.desc}
