@@ -16,6 +16,9 @@ import {
   RotateCcw,
   ChevronUp,
   ChevronDown,
+  Plus,
+  X,
+  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +26,15 @@ import { Badge } from '@/components/ui/badge';
 interface WebTerminalProps {
   className?: string;
 }
+
+interface TerminalSession {
+  id: string;
+  title: string;
+}
+
+const DEFAULT_SESSIONS: TerminalSession[] = [
+  { id: 'personal-1', title: 'Terminal 1' },
+];
 
 const QUICK_COMMANDS = [
   { label: 'Ctrl + C', cmd: '\x03', desc: 'Cancelar / Interrumpir proceso activo (SIGINT)' },
@@ -41,14 +53,49 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
   const isMountedRef = useRef<boolean>(true);
   const touchCleanupRef = useRef<(() => void) | null>(null);
 
+  const [sessions, setSessions] = useState<TerminalSession[]>(DEFAULT_SESSIONS);
+  const [activeSessionId, setActiveSessionId] = useState<string>('personal-1');
+  const activeSessionIdRef = useRef<string>('personal-1');
+
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('connecting');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const connectTerminal = useCallback(async () => {
+  // Cargar sesiones guardadas desde localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('personal_terminal_sessions');
+      const savedActive = localStorage.getItem('personal_terminal_active');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setSessions(parsed);
+          const initialActive =
+            savedActive && parsed.some((s) => s.id === savedActive) ? savedActive : parsed[0].id;
+          setActiveSessionId(initialActive);
+          activeSessionIdRef.current = initialActive;
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  const saveSessions = (updated: TerminalSession[], newActive?: string) => {
+    setSessions(updated);
+    try {
+      localStorage.setItem('personal_terminal_sessions', JSON.stringify(updated));
+      if (newActive) {
+        localStorage.setItem('personal_terminal_active', newActive);
+      }
+    } catch (e) {}
+  };
+
+  const connectTerminal = useCallback(async (targetSessionId?: string) => {
     try {
       setStatus('connecting');
       setErrorMessage(null);
+
+      const sessId = targetSessionId || activeSessionIdRef.current || 'personal-1';
+      activeSessionIdRef.current = sessId;
 
       // 1. Obtener configuración y token desde el endpoint local del dashboard
       const configRes = await fetch('/api/terminal-config');
@@ -150,7 +197,6 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
             if (e.cancelable) {
               e.preventDefault();
             }
-            // Cada ~14px de arrastre equivale a 1 línea de scroll
             const lines = Math.trunc(deltaY / 14);
             if (lines !== 0) {
               termInstanceRef.current.scrollLines(-lines);
@@ -176,8 +222,10 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
       if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
 
-      // 5. Conectar WebSocket a través de Cloudflare tunnel
-      const fullUrl = `${wsUrl}?token=${encodeURIComponent(token)}&cols=${term.cols}&rows=${term.rows}`;
+      // 5. Conectar WebSocket a través de Cloudflare tunnel con la sesión seleccionada
+      const fullUrl = `${wsUrl}?token=${encodeURIComponent(token)}&session=${encodeURIComponent(
+        sessId
+      )}&cols=${term.cols}&rows=${term.rows}`;
       const ws = new WebSocket(fullUrl);
       wsRef.current = ws;
 
@@ -212,7 +260,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
           } else if (parsed.type === 'heartbeat' || parsed.type === 'pong') {
             // Heartbeat recibido, el socket sigue vivo
           } else if (parsed.type === 'exit') {
-            term.writeln(`\r\n\x1b[33m[Proceso PTY terminado con código ${parsed.code}]\x1b[0m\r\n`);
+            term.writeln(`\r\n\x1b[33m[${parsed.data || `Proceso PTY finalizado`}]\x1b[0m\r\n`);
             setStatus('disconnected');
           } else if (parsed.type === 'error') {
             term.writeln(`\r\n\x1b[31m[Error: ${parsed.data}]\x1b[0m\r\n`);
@@ -227,11 +275,11 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
         if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
         setStatus('disconnected');
 
-        // Si el usuario sigue con la pestaña abierta, auto-reconectar en 2 segundos
+        // Auto-reconectar en 2s si la pestaña sigue visible
         if (isMountedRef.current && typeof document !== 'undefined' && document.visibilityState === 'visible') {
           reconnectTimeoutRef.current = setTimeout(() => {
             if (isMountedRef.current && wsRef.current?.readyState !== WebSocket.OPEN) {
-              connectTerminal();
+              connectTerminal(activeSessionIdRef.current);
             }
           }, 2000);
         }
@@ -249,8 +297,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
         if (ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify({ type: 'input', data }));
         } else {
-          // Si el socket murió, intentar reconectar de inmediato al tipear
-          connectTerminal();
+          connectTerminal(activeSessionIdRef.current);
         }
       });
     } catch (err: any) {
@@ -263,7 +310,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
   // Inicializar al montar y gestionar reconexión al volver de otra app (ej. WhatsApp)
   useEffect(() => {
     isMountedRef.current = true;
-    connectTerminal();
+    connectTerminal(activeSessionIdRef.current);
 
     const handleResize = () => {
       if (fitAddonRef.current && termInstanceRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
@@ -278,23 +325,22 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
       }
     };
 
-    // Al volver a la pestaña (después de usar WhatsApp u otra app), revivir el socket si se congeló
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-          connectTerminal();
+          connectTerminal(activeSessionIdRef.current);
         }
       }
     };
 
     const handleWindowFocus = () => {
       if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-        connectTerminal();
+        connectTerminal(activeSessionIdRef.current);
       }
     };
 
     const handleOnline = () => {
-      connectTerminal();
+      connectTerminal(activeSessionIdRef.current);
     };
 
     window.addEventListener('resize', handleResize);
@@ -375,6 +421,81 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
     };
   }, [isFullscreen]);
 
+  // Gestión de pestañas de sesiones
+  const switchSession = (sessionId: string) => {
+    if (sessionId === activeSessionId) return;
+    setActiveSessionId(sessionId);
+    activeSessionIdRef.current = sessionId;
+    try {
+      localStorage.setItem('personal_terminal_active', sessionId);
+    } catch (e) {}
+    connectTerminal(sessionId);
+  };
+
+  const addNewSession = () => {
+    if (sessions.length >= 6) {
+      alert('Puedes tener hasta 6 pestañas de terminal simultáneas.');
+      return;
+    }
+    const nextNum = sessions.length + 1;
+    const newId = `personal-${Date.now()}`;
+    const newSession: TerminalSession = {
+      id: newId,
+      title: `Terminal ${nextNum}`,
+    };
+    const updated = [...sessions, newSession];
+    saveSessions(updated, newId);
+    setActiveSessionId(newId);
+    activeSessionIdRef.current = newId;
+    connectTerminal(newId);
+  };
+
+  const closeSession = (sessionIdToClose: string) => {
+    if (sessions.length <= 1) {
+      if (window.confirm('¿Deseas reiniciar esta terminal desde cero?')) {
+        handleResetSession();
+      }
+      return;
+    }
+
+    const sessionObj = sessions.find((s) => s.id === sessionIdToClose);
+    if (
+      !window.confirm(
+        `¿Cerrar '${sessionObj?.title || 'la sesión'}'? Los procesos que corren en esta pestaña se finalizarán.`
+      )
+    ) {
+      return;
+    }
+
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      try {
+        wsRef.current.send(JSON.stringify({ type: 'kill', session: sessionIdToClose }));
+      } catch (e) {}
+    }
+
+    const updated = sessions.filter((s) => s.id !== sessionIdToClose);
+    let nextActive = activeSessionId;
+    if (sessionIdToClose === activeSessionId) {
+      nextActive = updated[0].id;
+      setActiveSessionId(nextActive);
+      activeSessionIdRef.current = nextActive;
+      connectTerminal(nextActive);
+    }
+    saveSessions(updated, nextActive);
+  };
+
+  const renameSession = (sessionId: string) => {
+    const current = sessions.find((s) => s.id === sessionId);
+    if (!current) return;
+    const newTitle = window.prompt('Nombre de la pestaña:', current.title);
+    if (newTitle && newTitle.trim()) {
+      const updated = sessions.map((s) =>
+        s.id === sessionId ? { ...s, title: newTitle.trim().slice(0, 20) } : s
+      );
+      saveSessions(updated);
+    }
+  };
+
   // Enviar comando rápido
   const sendQuickCommand = (cmd: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -389,12 +510,18 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
   };
 
   const handleResetSession = () => {
-    if (typeof window !== 'undefined' && window.confirm('¿Deseas reiniciar la sesión de terminal desde cero? Esto cerrará los procesos que tengas corriendo en segundo plano.')) {
+    const currentTitle = sessions.find((s) => s.id === activeSessionId)?.title || 'actual';
+    if (
+      typeof window !== 'undefined' &&
+      window.confirm(
+        `¿Deseas reiniciar '${currentTitle}' desde cero? Se cerrarán los procesos en segundo plano de esta pestaña.`
+      )
+    ) {
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
         wsRef.current.send(JSON.stringify({ type: 'reset' }));
       }
       setTimeout(() => {
-        connectTerminal();
+        connectTerminal(activeSessionId);
       }, 600);
     }
   };
@@ -422,6 +549,10 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
             <span className="font-bold tracking-wide">Web Terminal Interactiva</span>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-400 font-mono font-semibold border border-blue-500/25 hidden sm:inline">
               tmux persistente
+            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-400 font-mono hidden md:inline flex items-center gap-1">
+              <Clock className="w-2.5 h-2.5 text-amber-400" />
+              auto-cierre: 30m inactivo
             </span>
           </div>
         </div>
@@ -482,7 +613,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
 
           {/* Reconnect Button */}
           <Button
-            onClick={connectTerminal}
+            onClick={() => connectTerminal(activeSessionId)}
             size="sm"
             variant="ghost"
             className="h-7 text-xs text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 px-2 rounded-lg cursor-pointer"
@@ -506,6 +637,64 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
             {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </Button>
         </div>
+      </div>
+
+      {/* Tabs Bar: Múltiples Sesiones */}
+      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#080d1a] border-b border-slate-800/80 overflow-x-auto text-xs shrink-0 select-none">
+        <div className="flex items-center gap-1 text-[11px] text-slate-400 font-semibold uppercase tracking-wider mr-1 shrink-0">
+          <TerminalIcon className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="hidden sm:inline">Pestañas:</span>
+        </div>
+
+        {sessions.map((sess) => {
+          const isActive = sess.id === activeSessionId;
+          return (
+            <div
+              key={sess.id}
+              onClick={() => switchSession(sess.id)}
+              onDoubleClick={() => renameSession(sess.id)}
+              className={`group flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 border ${
+                isActive
+                  ? 'bg-blue-600/25 text-blue-200 border-blue-500/50 font-semibold shadow-xs'
+                  : 'bg-slate-900/60 text-slate-400 hover:text-slate-200 hover:bg-slate-800/70 border-slate-800/80'
+              }`}
+              title="Clic para ver pestaña | Doble clic para renombrar"
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  isActive ? 'bg-cyan-400 animate-pulse' : 'bg-slate-600'
+                }`}
+              />
+              <span className="max-w-[120px] truncate">{sess.title}</span>
+
+              {sessions.length > 1 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeSession(sess.id);
+                  }}
+                  className="text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 p-0.5 rounded transition-all ml-0.5"
+                  title="Cerrar esta pestaña"
+                  aria-label="Cerrar pestaña"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          );
+        })}
+
+        {/* Botón Nueva Sesión */}
+        <button
+          type="button"
+          onClick={addNewSession}
+          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono text-slate-400 hover:text-cyan-300 hover:bg-slate-800/80 border border-dashed border-slate-700/80 transition-all cursor-pointer shrink-0 ml-0.5"
+          title="Abrir nueva sesión de terminal independiente"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span className="text-[11px] hidden sm:inline">Nueva Sesión</span>
+        </button>
       </div>
 
       {/* Quick Commands Bar */}
@@ -546,7 +735,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
             <span>{errorMessage}</span>
           </div>
           <Button
-            onClick={connectTerminal}
+            onClick={() => connectTerminal(activeSessionId)}
             size="sm"
             variant="outline"
             className="h-6 text-[11px] border-rose-500/40 hover:bg-rose-500/20 text-white rounded px-2 cursor-pointer"
@@ -595,7 +784,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
 
       {/* Terminal Footer Info */}
       <div className="flex items-center justify-between px-4 py-1.5 bg-[#060911] border-t border-slate-800/80 text-[11px] text-slate-500 font-mono shrink-0">
-        <span>Soporta teclas interactivas, Ctrl+C, Ctrl+L, Tab y flechas arriba/abajo</span>
+        <span>Soporta pestañas concurrentes, atajos y auto-cierre tras 30 min inactivo</span>
         <span className="text-slate-400">WebSocket Cifrado (WSS)</span>
       </div>
     </div>
