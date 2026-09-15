@@ -13,6 +13,7 @@ import {
   AlertCircle,
   ShieldCheck,
   Play,
+  RotateCcw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -301,6 +302,17 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
     termInstanceRef.current?.focus();
   };
 
+  const handleResetSession = () => {
+    if (typeof window !== 'undefined' && window.confirm('¿Deseas reiniciar la sesión de terminal desde cero? Esto cerrará los procesos que tengas corriendo en segundo plano.')) {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ type: 'reset' }));
+      }
+      setTimeout(() => {
+        connectTerminal();
+      }, 600);
+    }
+  };
+
   return (
     <div
       className={`relative transition-all duration-300 ${
@@ -322,7 +334,9 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
           <div className="flex items-center gap-2 font-mono text-xs text-slate-200">
             <TerminalIcon className="w-4 h-4 text-cyan-400" />
             <span className="font-bold tracking-wide">Web Terminal Interactiva</span>
-            <span className="text-[11px] text-slate-500 hidden sm:inline">bash (julian@vacas-locas-server)</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-400 font-mono font-semibold border border-blue-500/25 hidden sm:inline">
+              tmux persistente
+            </span>
           </div>
         </div>
 
@@ -367,6 +381,17 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
             title="Limpiar pantalla"
           >
             <Trash2 className="w-3.5 h-3.5" />
+          </Button>
+
+          {/* Reset Session Button */}
+          <Button
+            onClick={handleResetSession}
+            size="sm"
+            variant="ghost"
+            className="h-7 text-xs text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 px-2 rounded-lg cursor-pointer"
+            title="Reiniciar sesión persistente desde cero (cierra procesos en background)"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
           </Button>
 
           {/* Reconnect Button */}
