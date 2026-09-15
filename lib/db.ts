@@ -61,6 +61,10 @@ const BACKEND_TASKS_URL = process.env.DATA_PROCESSOR_URL
   ? `${process.env.DATA_PROCESSOR_URL}/api/personal/tasks`
   : 'https://apivacas.jariel.com.ar/api/personal/tasks';
 
+const BACKEND_NEWS_URL = process.env.DATA_PROCESSOR_URL
+  ? `${process.env.DATA_PROCESSOR_URL}/api/personal/news`
+  : 'https://apivacas.jariel.com.ar/api/personal/news';
+
 // Database Adapter Interface
 export const db = {
   // TASKS (Persistidas en MongoDB a través del backend en VPS)
@@ -308,6 +312,26 @@ export const db = {
 
   // NEWS ARTICLES (Retención automática de 7 días / 1 semana)
   getNews: async (category?: string): Promise<NewsArticle[]> => {
+    try {
+      const url = category
+        ? `${BACKEND_NEWS_URL}?category=${encodeURIComponent(category)}`
+        : BACKEND_NEWS_URL;
+      const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      });
+      if (res.ok) {
+        const json = await res.json();
+        const articles = json.data || json;
+        if (Array.isArray(articles)) {
+          writeJsonFile(NEWS_FILE, articles);
+          return articles;
+        }
+      }
+    } catch (err) {
+      console.warn('⚠️ [db.ts] Backend no disponible para getNews, usando caché local:', err);
+    }
+
     const rawArticles = readJsonFile<NewsArticle[]>(NEWS_FILE, INITIAL_NEWS);
     const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
     const cutoff = Date.now() - SEVEN_DAYS_MS;
@@ -328,7 +352,7 @@ export const db = {
   },
 
   getNewsById: async (id: string): Promise<NewsArticle | null> => {
-    const articles = readJsonFile<NewsArticle[]>(NEWS_FILE, INITIAL_NEWS);
+    const articles = await db.getNews();
     return articles.find((a) => a.id === id) || null;
   },
 

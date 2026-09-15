@@ -1,5 +1,152 @@
 [
   {
+    "id": "news-1789470012300-rnzjn",
+    "title": "Descubren una vulnerabilidad crítica de día cero en protocolos empresariales de Linux y sistemas Cloud",
+    "content": "## Contexto\n\nLa comunidad de código abierto y los equipos de operaciones de infraestructura (DevOps) se encuentran en alerta tras la divulgación de una vulnerabilidad de escalamiento de privilegios en componentes nucleares de Linux. El vector de ataque podría permitir a actores maliciosos ejecutar código remoto en entornos virtualizados si no se aplican las mitigaciones correspondientes.\n\n### Puntos clave\n- Identificación de un fallo crítico (CVE-2026-XXXX) en servicios de red y gestión de memoria.\n- Liberación urgente de parches de seguridad por parte de los principales mantenedores del kernel.\n- Llamado a los administradores de sistemas a auditar la infraestructura Cloud y aplicar actualizaciones.",
+    "summary": "Equipos de ciberseguridad identificaron un fallo de seguridad que afecta a distribuciones de código abierto ampliamente utilizadas en servidores corporativos. Los desarrolladores ya lanzaron parches de emergencia y recomiendan actualizaciones inmediatas.",
+    "source": "Ars Technica",
+    "url": "https://arstechnica.com/security/2026/09/critical-linux-zero-day-vulnerability-patches-released/",
+    "imageUrl": "",
+    "category": "Ciberseguridad",
+    "tags": [
+      "Tecnología",
+      "Ciberseguridad",
+      "Linux",
+      "Dev & Cloud"
+    ],
+    "important": false,
+    "fetchedAt": "2026-09-15T11:00:12.300Z",
+    "publishedAt": "2026-09-15T11:00:10.733Z",
+    "createdAt": "2026-09-15T11:00:12.300Z",
+    "updatedAt": "2026-09-15T11:00:12.300Z"
+  },
+  {
+    "id": "news-1789470012216-hsex9",
+    "title": "Nvidia anuncia una nueva arquitectura de microchips y procesadores cuántico-híbridos para centros de datos",
+    "content": "## Contexto\n\nEn un evento global para desarrolladores de hardware y arquitectos de sistemas, Nvidia desveló detalles técnicos de su nueva familia de microchips fabricados bajo nodos litográficos avanzados. Estos procesadores integran capacidades híbridas diseñadas para acelerar simulaciones científicas complejas y procesamiento masivo de datos a escala hiperescala.\n\n### Puntos clave\n- Presentación de la nueva arquitectura de semiconductores orientada a centros de datos de alta densidad.\n- Reducción estimada del 40% en el consumo energético por teraflops procesado.\n- Alianzas estratégicas con principales fabricantes de servidores y proveedores cloud globales.",
+    "summary": "La compañía tecnológica reveló su hoja de ruta para semiconductores de próxima generación, optimizados para cargas de trabajo masivas y computación heterogénea. La industria de hardware reacciona ante un salto significativo en eficiencia energética y rendimiento de cómputo.",
+    "source": "Reuters Tech",
+    "url": "https://www.reuters.com/technology/nvidia-announces-next-gen-chips-hybrid-computing-2026-09-15/",
+    "imageUrl": "",
+    "category": "Hardware",
+    "tags": [
+      "Tecnología",
+      "Nvidia",
+      "Hardware",
+      "Semiconductores"
+    ],
+    "important": true,
+    "fetchedAt": "2026-09-15T11:00:12.216Z",
+    "publishedAt": "2026-09-15T11:00:10.733Z",
+    "createdAt": "2026-09-15T11:00:12.216Z",
+    "updatedAt": "2026-09-15T11:00:12.216Z"
+  },
+  {
+    "id": "news-1789470012131-0bsck",
+    "title": "Avanza el plan de infraestructura vial y modernización portuaria en el Litoral y la Provincia de Buenos Aires",
+    "content": "## Contexto\n\nCon un fuerte enfoque en la participación público-privada, el Gobierno nacional puso en marcha un paquete de obras viales y portuarias destinadas a destrabar los principales cuellos de botella logísticos del país. Las inversiones se concentran en corredores productivos clave que conectan el centro agrícola con los puertos de exportación.\n\n### Puntos clave\n- Esquema de financiamiento mixto mediante iniciativas de participación público-privada (PPP).\n- Obras prioritarias en rutas nacionales y accesos a terminales fluviales.\n- Reducción proyectada en los costos logísticos para las economías regionales.",
+    "summary": "El Ministerio de Economía y Transporte firmó nuevos convenios con el sector privado para la ejecución de obras logísticas. El objetivo es reducir costos de transporte y potenciar la competitividad exportadora de las economías regionales.",
+    "source": "Clarín",
+    "url": "https://www.clarin.com/economia/infraestructura-vial-puertos-litoral-inversiones-privadas_0_xyz123.html",
+    "imageUrl": "",
+    "category": "Argentina",
+    "tags": [
+      "Argentina",
+      "Infraestructura",
+      "Logística",
+      "Economía"
+    ],
+    "important": false,
+    "fetchedAt": "2026-09-15T11:00:12.131Z",
+    "publishedAt": "2026-09-15T11:00:10.733Z",
+    "createdAt": "2026-09-15T11:00:12.131Z",
+    "updatedAt": "2026-09-15T11:00:12.131Z"
+  },
+  {
+    "id": "news-1789470012044-vr0p5",
+    "title": "El sector agroexportador liquida divisas por encima del promedio estacional y alivia las cuentas públicas",
+    "content": "## Contexto\n\nEl complejo agroexportador argentino muestra un dinamismo superior al esperado para esta época del año, impulsado por una mayor liquidación de granos retenidos y la mejora en los precios internacionales de ciertos commodities. Este ingreso masivo de divisas le otorga un respiro fundamental al Banco Central en su objetivo de robustecer las reservas internacionales.\n\n### Puntos clave\n- Incremento interanual en la liquidación de divisas del sector agroindustrial.\n- Factores internacionales que favorecen la comercialización de soja, maíz y girasol.\n- Impacto directo en la recaudación fiscal por derechos de exportación.",
+    "summary": "Las terminales agroindustriales reportaron un incremento en el ingreso de dólares durante las últimas semanas. El repunte en la comercialización de granos y subproductos aporta un flujo indispensable para sostener la estabilidad cambiaria.",
+    "source": "Infobae",
+    "url": "https://www.infobae.com/economia/2026/09/15/agro-exportaciones-dolares-bcra-campo/",
+    "imageUrl": "",
+    "category": "Economía",
+    "tags": [
+      "Argentina",
+      "Agro",
+      "Exportaciones",
+      "Economía"
+    ],
+    "important": false,
+    "fetchedAt": "2026-09-15T11:00:12.044Z",
+    "publishedAt": "2026-09-15T11:00:10.733Z",
+    "createdAt": "2026-09-15T11:00:12.044Z",
+    "updatedAt": "2026-09-15T11:00:12.044Z"
+  },
+  {
+    "id": "news-1789470011894-vkg90",
+    "title": "Debate caliente en el Congreso por la sanción de leyes clave para el presupuesto nacional y obras públicas",
+    "content": "## Contexto\n\nEl Parlamento argentino vive semanas de intensa actividad política con la discusión de iniciativas centrales para el equilibrio fiscal y la gobernabilidad. Mientras el oficialismo busca blindar el déficit cero mediante acuerdos con gobernadores aliados, la oposición presiona por mayores partidas para sectores vulnerables y educación superior.\n\n### Puntos clave\n- Negociaciones contrarreloj entre el oficialismo y bloques dialoguistas en el Congreso.\n- Discusión central en torno al financiamiento universitario y las jubilaciones.\n- Preparativos legislativos para el debate del Presupuesto 2027.",
+    "summary": "Diputados y Senadores discuten los proyectos prioritarios de la agenda legislativa de la segunda mitad del año. La oposición y los bloques dialoguistas negocian modificaciones en el articulado fiscal y el financiamiento de universidades y jubilaciones.",
+    "source": "La Nación",
+    "url": "https://www.lanacion.com.ar-politica/congreso-nacional-sesiones-presupuesto-leyes-clave-nid15092026/",
+    "imageUrl": "",
+    "category": "Argentina",
+    "tags": [
+      "Argentina",
+      "Política",
+      "Congreso",
+      "Presupuesto"
+    ],
+    "important": false,
+    "fetchedAt": "2026-09-15T11:00:11.894Z",
+    "publishedAt": "2026-09-15T11:00:10.733Z",
+    "createdAt": "2026-09-15T11:00:11.894Z",
+    "updatedAt": "2026-09-15T11:00:11.894Z"
+  },
+  {
+    "id": "news-1789470011806-yq2is",
+    "title": "El Banco Central acelera la acumulación de reservas y define nuevas pautas para el mercado de cambios",
+    "content": "## Contexto\n\nEn medio de un escenario financiero internacional volátil, el Banco Central de la República Argentina (BCRA) reporta un saldo positivo en sus intervenciones diarias en el mercado de cambios. La estrategia apunta a fortalecer las reservas netas internacionales para cumplir con las metas acordadas con los organismos multilaterales de crédito y despejar temores de devaluación.\n\n### Puntos clave\n- Compras sostenidas de divisas por parte de la autoridad monetaria en el MULC.\n- Debate en el directorio sobre la flexibilización gradual de restricciones cambiarias corporativas.\n- Impacto positivo en la cotización de los bonos soberanos y compresión del riesgo país.",
+    "summary": "La autoridad monetaria continúa con compras sostenidas de divisas en el Mercado Único y Libre de Cambios. En paralelo, analizan flexibilizaciones normativas para optimizar la liquidez del sistema financiero y dar previsibilidad a los exportadores.",
+    "source": "El Cronista",
+    "url": "https://www.cronista.com/finanzas-mercados/bcra-reservas-dolar-mercado-cambios-septiembre/",
+    "imageUrl": "",
+    "category": "Argentina",
+    "tags": [
+      "Argentina",
+      "BCRA",
+      "Finanzas",
+      "Dólar"
+    ],
+    "important": false,
+    "fetchedAt": "2026-09-15T11:00:11.806Z",
+    "publishedAt": "2026-09-15T11:00:10.733Z",
+    "createdAt": "2026-09-15T11:00:11.806Z",
+    "updatedAt": "2026-09-15T11:00:11.806Z"
+  },
+  {
+    "id": "news-1789470011310-nzcej",
+    "title": "El INDEC anuncia el índice de inflación de agosto y el Gobierno busca consolidar la desaceleración de precios",
+    "content": "## Contexto\n\nEl Instituto Nacional de Estadística y Censos (INDEC) se prepara para publicar el dato oficial de inflación de agosto en una jornada clave para la estrategia macroeconómica del Palacio de Hacienda. Las consultoras privadas estiman que la cifra se ubicará levemente por debajo del registro de julio, consolidando un sendero decreciente a pesar de la inercia en ciertos rubros estacionales y de servicios regulados.\n\n### Puntos clave\n- Estimaciones privadas ubican la inflación de agosto en torno al 3.5%.\n- El equipo económico busca anclar las expectativas inflacionarias de cara al tramo final del año.\n- Impacto directo en la negociación de paritarias y en la reactivación del consumo masivo.",
+    "summary": "El organismo estadístico dará a conocer la variación del Índice de Precios al Consumidor correspondiente al mes anterior. El equipo económico confía en que se mantenga la tendencia a la baja hacia la zona del 3%, mientras monitorea el impacto en las paritarias y el consumo interno.",
+    "source": "Ámbito Financiero",
+    "url": "https://www.ambito.com/economia/inflacion-agosto-indec-expectativas-mercado-n5980000",
+    "imageUrl": "",
+    "category": "Economía",
+    "tags": [
+      "Argentina",
+      "Economía",
+      "INDEC",
+      "Inflación"
+    ],
+    "important": true,
+    "fetchedAt": "2026-09-15T11:00:11.310Z",
+    "publishedAt": "2026-09-15T11:00:10.733Z",
+    "createdAt": "2026-09-15T11:00:11.310Z",
+    "updatedAt": "2026-09-15T11:00:11.310Z"
+  },
+  {
     "id": "news-1789435494879-tpwa3",
     "title": "Descubren una vulnerabilidad crítica de día cero en protocolos de enrutamiento de código abierto",
     "content": "## Alerta de ciberseguridad\n\nUn grupo independiente de analistas de seguridad informática divulgó los detalles de una vulnerabilidad de día cero catalogada como crítica en librerías esenciales para el enrutamiento de paquetes IP en sistemas Unix y derivados. El fallo permite a atacantes remotos manipular tablas de enrutamiento y comprometer nodos centrales de red bajo determinadas condiciones de configuración.\n\n### Respuesta de la comunidad\n\nLos mantenedores de los principales proyectos de software libre afectados lanzaron actualizaciones de seguridad de forma coordinada. Los administradores de sistemas e infraestructura DevOps han sido instados a aplicar los parches de mitigación de manera inmediata para evitar incidentes de interrupción de servicios.\n\n### Puntos clave\n- Hallazgo de vulnerabilidad crítica en protocolos de red de código abierto.\n- Riesgo potencial de ejecución remota de código en infraestructura crítica.\n- Lanzamiento inmediato de parches de actualización por parte de la comunidad de desarrolladores.",
