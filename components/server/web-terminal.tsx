@@ -37,6 +37,9 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
   const termInstanceRef = useRef<any>(null);
   const fitAddonRef = useRef<any>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const heartbeatTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isMountedRef = useRef<boolean>(true);
 
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('connecting');
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -119,7 +122,11 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
       termInstanceRef.current = term;
       fitAddonRef.current = fitAddon;
 
-      // 4. Conectar WebSocket a través de Cloudflare tunnel
+      // 4. Limpiar timers previos
+      if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+
+      // 5. Conectar WebSocket a través de Cloudflare tunnel
       const fullUrl = `${wsUrl}?token=${encodeURIComponent(token)}&cols=${term.cols}&rows=${term.rows}`;
       const ws = new WebSocket(fullUrl);
       wsRef.current = ws;
@@ -127,6 +134,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
       ws.onopen = () => {
         setStatus('connected');
         setErrorMessage(null);
+
         // Ajustar tamaño con el PTY del servidor
         ws.send(
           JSON.stringify({
@@ -135,6 +143,15 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
             rows: term.rows,
           })
         );
+
+        // Heartbeat cada 12 segundos para mantener el túnel y el socket siempre activos
+        heartbeatTimerRef.current = setInterval(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            try {
+              ws.send(JSON.stringify({ type: 'ping' }));
+            } catch {}
+          }
+        }, 12000);
       };
 
       ws.onmessage = (event) => {
@@ -142,6 +159,8 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
           const parsed = JSON.parse(event.data);
           if (parsed.type === 'output') {
             term.write(parsed.data);
+          } else if (parsed.type === 'heartbeat' || parsed.type === 'pong') {
+            // Heartbeat recibido, el socket sigue vivo
           } else if (parsed.type === 'exit') {
             term.writeln(`\r\n\x1b[33m[Proceso PTY terminado con código ${parsed.code}]\x1b[0m\r\n`);
             setStatus('disconnected');
@@ -155,19 +174,33 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
       };
 
       ws.onclose = () => {
+        if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
         setStatus('disconnected');
+
+        // Si el usuario sigue con la pestaña abierta, auto-reconectar en 2 segundos
+        if (isMountedRef.current && typeof document !== 'undefined' && document.visibilityState === 'visible') {
+          reconnectTimeoutRef.current = setTimeout(() => {
+            if (isMountedRef.current && wsRef.current?.readyState !== WebSocket.OPEN) {
+              connectTerminal();
+            }
+          }, 2000);
+        }
       };
 
       ws.onerror = (err) => {
+        if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
         console.warn('[WebTerminal] Error en socket:', err);
         setStatus('error');
         setErrorMessage('Error al conectar con el servidor WebSocket.');
       };
 
-      // 5. Enviar teclas del usuario hacia el PTY
+      // 6. Enviar teclas del usuario hacia el PTY
       term.onData((data) => {
         if (ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify({ type: 'input', data }));
+        } else {
+          // Si el socket murió, intentar reconectar de inmediato al tipear
+          connectTerminal();
         }
       });
     } catch (err: any) {
@@ -177,8 +210,9 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
     }
   }, []);
 
-  // Inicializar al montar
+  // Inicializar al montar y gestionar reconexión al volver de otra app (ej. WhatsApp)
   useEffect(() => {
+    isMountedRef.current = true;
     connectTerminal();
 
     const handleResize = () => {
@@ -194,10 +228,38 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
       }
     };
 
+    // Al volver a la pestaña (después de usar WhatsApp u otra app), revivir el socket si se congeló
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+          connectTerminal();
+        }
+      }
+    };
+
+    const handleWindowFocus = () => {
+      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+        connectTerminal();
+      }
+    };
+
+    const handleOnline = () => {
+      connectTerminal();
+    };
+
     window.addEventListener('resize', handleResize);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
+    window.addEventListener('online', handleOnline);
 
     return () => {
+      isMountedRef.current = false;
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleWindowFocus);
+      window.removeEventListener('online', handleOnline);
+      if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
       if (wsRef.current) {
         wsRef.current.close();
       }
