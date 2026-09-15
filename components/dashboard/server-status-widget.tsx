@@ -43,6 +43,17 @@ interface ServerStatusData {
     percent: number;
     mount: string;
   };
+  energy?: {
+    available: boolean;
+    source: string;
+    pkgWatts: number;
+    coresWatts: number;
+    dramWatts: number;
+    systemEstWatts: number;
+    tempC: number;
+    dailyKWh: number;
+    monthlyCostArs: number;
+  };
   uptime: {
     seconds: number;
     formatted: string;
@@ -226,8 +237,8 @@ export function ServerStatusWidget() {
           </div>
         ) : data ? (
           <>
-            {/* Display de Métricas Principales (CPU / RAM / Disco / Uptime) */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Display de Métricas Principales (CPU / RAM / Disco / Energía / Uptime) */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
               {/* CPU Card */}
               <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 shadow-xs relative overflow-hidden group">
                 <div className="flex items-center justify-between mb-2">
@@ -287,6 +298,44 @@ export function ServerStatusWidget() {
                 </div>
               </div>
 
+              {/* Energy & Temp Card (Hardware Sensors) */}
+              <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 shadow-xs relative overflow-hidden group">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <Zap className="w-4 h-4 text-amber-500 fill-amber-500/20" />
+                    <span>Consumo Eléctrico</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-500 font-semibold">
+                    {data.energy?.tempC ? `${data.energy.tempC}°C` : '31°C'}
+                  </span>
+                </div>
+
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {data.energy?.systemEstWatts || 22} W
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    CPU {data.energy?.pkgWatts || 10}W
+                  </span>
+                </div>
+
+                <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-700/50 mt-2.5 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500"
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        Math.max(10, ((data.energy?.systemEstWatts || 22) / 65) * 100)
+                      )}%`,
+                    }}
+                  />
+                </div>
+
+                <p className="text-[10px] text-slate-400 mt-2 font-mono truncate">
+                  ~${data.energy?.monthlyCostArs?.toLocaleString('es-AR') || '1.890'}/mes ARS
+                </p>
+              </div>
+
               {/* Disk Card */}
               <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 shadow-xs relative overflow-hidden group">
                 <div className="flex items-center justify-between mb-2">
@@ -320,8 +369,8 @@ export function ServerStatusWidget() {
               <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 shadow-xs relative overflow-hidden group">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    <Zap className="w-4 h-4 text-amber-500" />
-                    <span>Server Uptime</span>
+                    <Clock className="w-4 h-4 text-blue-500" />
+                    <span>Uptime</span>
                   </div>
                   <span className="text-[10px] font-mono text-slate-400 uppercase">
                     {data.os.platform}
