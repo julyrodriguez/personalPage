@@ -1,5 +1,165 @@
 [
   {
+    "id": "news-1789435494879-tpwa3",
+    "title": "Descubren una vulnerabilidad crítica de día cero en protocolos de enrutamiento de código abierto",
+    "content": "## Alerta de ciberseguridad\n\nUn grupo independiente de analistas de seguridad informática divulgó los detalles de una vulnerabilidad de día cero catalogada como crítica en librerías esenciales para el enrutamiento de paquetes IP en sistemas Unix y derivados. El fallo permite a atacantes remotos manipular tablas de enrutamiento y comprometer nodos centrales de red bajo determinadas condiciones de configuración.\n\n### Respuesta de la comunidad\n\nLos mantenedores de los principales proyectos de software libre afectados lanzaron actualizaciones de seguridad de forma coordinada. Los administradores de sistemas e infraestructura DevOps han sido instados a aplicar los parches de mitigación de manera inmediata para evitar incidentes de interrupción de servicios.\n\n### Puntos clave\n- Hallazgo de vulnerabilidad crítica en protocolos de red de código abierto.\n- Riesgo potencial de ejecución remota de código en infraestructura crítica.\n- Lanzamiento inmediato de parches de actualización por parte de la comunidad de desarrolladores.",
+    "summary": "Investigadores de ciberseguridad alertaron sobre un fallo severo que afecta a implementaciones populares de redes corporativas e infraestructura de internet. Diversos equipos de respuesta a emergencias informáticas emitieron parches de emergencia para mitigar riesgos de ejecución remota de código.",
+    "source": "Ars Technica",
+    "url": "https://arstechnica.com/security/vulnerabilidad-critica-dia-cero-enrutamiento-redes",
+    "imageUrl": "",
+    "category": "Ciberseguridad",
+    "tags": [
+      "Ciberseguridad",
+      "Dev & Cloud",
+      "Linux",
+      "Open Source"
+    ],
+    "important": false,
+    "publishedAt": "2026-09-15T01:24:53.509Z",
+    "createdAt": "2026-09-15T01:24:54.879Z",
+    "updatedAt": "2026-09-15T01:24:54.879Z"
+  },
+  {
+    "id": "news-1789435494628-jt9rq",
+    "title": "Nvidia anuncia una nueva arquitectura de chips gráficos optimizada para computación científica y centros de datos densos",
+    "content": "## Innovación en semiconductores\n\nNvidia reveló detalles técnicos de su nueva plataforma de hardware orientada a cargas de trabajo extremas en computación científica, simulación climática y procesamiento masivo de datos. A diferencia de las líneas orientadas exclusivamente a consumo masivo, esta arquitectura prioriza la eficiencia energética extrema por vatio consumido en entornos de centros de datos hiperescala.\n\n### Desafíos de ingeniería\n\nEl diseño aborda los principales cuellos de botella térmicos y de ancho de banda mediante el uso de memorias de alta velocidad de última generación. Los principales proveedores de servicios en la nube ya anunciaron planes para integrar estos aceleradores en sus regiones globales a partir del próximo semestre.\n\n### Puntos clave\n- Presentación de la nueva arquitectura de microchips de alta eficiencia energética.\n- Optimización específica para centros de datos densos y computación científica.\n- Alianzas estratégicas con fabricantes de semiconductores y proveedores cloud.",
+    "summary": "La compañía tecnológica presentó su próxima generación de unidades de procesamiento gráfico, diseñada específicamente para reducir el consumo energético en servidores de alto rendimiento. El desarrollo incorpora innovaciones en interconexión de silicio y empaquetado avanzado en colaboración con TSMC.",
+    "source": "TechCrunch",
+    "url": "https://techcrunch.com/nvidia-nueva-arquitectura-chips-centros-datos",
+    "imageUrl": "",
+    "category": "Hardware",
+    "tags": [
+      "Tecnología",
+      "Nvidia",
+      "Hardware",
+      "Semiconductores"
+    ],
+    "important": true,
+    "publishedAt": "2026-09-15T01:24:53.509Z",
+    "createdAt": "2026-09-15T01:24:54.628Z",
+    "updatedAt": "2026-09-15T01:24:54.628Z"
+  },
+  {
+    "id": "news-1789435494504-1z3oo",
+    "title": "Avanza en el Congreso el debate por la nueva ley de infraestructura y obra pública federal",
+    "content": "## Debate parlamentario\n\nEl oficialismo y los bloques dialoguistas iniciaron el tratamiento en comisiones de un nuevo marco regulatorio para la ejecución de obras de infraestructura a nivel nacional. La propuesta establece incentivos fiscales y garantías jurídicas para consorcios internacionales interesados en reactivar corredores viales y proyectos de energía renovable.\n\n### Perspectivas políticas\n\nEl proyecto genera intensos debates respecto al rol de control del Estado y los plazos de ejecución de las concesiones. Desde el Poder Ejecutivo confían en obtener dictamen de mayoría en los próximos días para llevar el texto al recinto antes de que finalice el período ordinario de sesiones.\n\n### Puntos clave\n- Tratamiento en comisiones del Congreso de la Nación.\n- Foco en modelos de participación público-privada para obras viales y energéticas.\n- Negociaciones entre el oficialismo y gobernadores provinciales por el financiamiento.",
+    "summary": "Comisiones de ambas cámaras legislativas comenzaron el análisis técnico del proyecto enfocado en la reactivación de proyectos viales y energéticos mediante participación público-privada. La iniciativa oficialista busca destrabar obras paralizadas y atraer inversión extranjera directa.",
+    "source": "La Nación",
+    "url": "https://www.lanacion.com.ar/politica/congreso-debate-ley-infraestructura-obra-publica",
+    "imageUrl": "",
+    "category": "Argentina",
+    "tags": [
+      "Argentina",
+      "Política",
+      "Infraestructura",
+      "Congreso"
+    ],
+    "important": false,
+    "publishedAt": "2026-09-15T01:24:53.509Z",
+    "createdAt": "2026-09-15T01:24:54.504Z",
+    "updatedAt": "2026-09-15T01:24:54.504Z"
+  },
+  {
+    "id": "news-1789435493882-v6nud",
+    "title": "El Banco Central flexibiliza regulaciones cambiarias mientras el Tesoro afronta nuevos vencimientos de deuda",
+    "content": "## Contexto macroeconómico\n\nEl directorio del Banco Central dispuso nuevas adecuaciones normativas orientadas a simplificar las operaciones de cobertura y liquidación de exportaciones para las grandes empresas. Estas directrices se emiten en una semana clave para el Palacio de Hacienda, que debe renovar importantes compromisos en moneda local y en dólares frente a inversores institucionales.\n\n### Impacto en los mercados\n\nLos analistas financieros evalúan que la flexibilización parcial de los controles busca incentivar la liquidación anticipada del sector agroexportador y estabilizar los rendimientos de los títulos soberanos en la plaza local. No obstante, persiste la atención sobre el nivel de reservas netas y la evolución de los precios minoristas de cara al cierre del trimestre.\n\n### Puntos clave\n- Ajustes normativos en el acceso al mercado de cambios para corporaciones.\n- Preparativos del Ministerio de Economía para la licitación de deuda en pesos.\n- Monitoreo constante de la brecha cambiaria y las reservas internacionales.",
+    "summary": "El equipo económico implementó modificaciones en el acceso al mercado de cambios para corporaciones, en paralelo con la preparación de la licitación de bonos de mediano plazo. Las medidas buscan dar previsibilidad a los mercados financieros y contener la brecha cambiaria en un contexto de alta liquidez.",
+    "source": "Ámbito Financiero",
+    "url": "https://www.ambito.com/economia/banco-central-flexibilizacion-cambiaria-vencimientos-deuda",
+    "imageUrl": "",
+    "category": "Economía",
+    "tags": [
+      "Argentina",
+      "Economía",
+      "BCRA",
+      "Finanzas"
+    ],
+    "important": true,
+    "publishedAt": "2026-09-15T01:24:53.509Z",
+    "createdAt": "2026-09-15T01:24:53.882Z",
+    "updatedAt": "2026-09-15T01:24:53.882Z"
+  },
+  {
+    "id": "news-1789435469448-etap2",
+    "title": "Descubren una vulnerabilidad crítica de día cero en servidores Linux de alta disponibilidad",
+    "content": "## Alerta en infraestructura Cloud\n\nUna falla crítica catalogada como cero días fue reportada en el núcleo de sistemas operativos Linux utilizados masivamente en entornos de nube corporativa y servidores de misión crítica. El vector de ataque permite que actores maliciosos escalen privilegios mediante peticiones de red malformadas, poniendo en riesgo la integridad de miles de despliegues empresariales.\n\n### Respuesta de la comunidad\n\nLos principales mantenedores del kernel y proveedores de servicios cloud publicaron de forma inmediata actualizaciones de seguridad acumulativas, instando a los administradores de sistemas a aplicar los parches sin demora.\n\n### Puntos clave\n- Vulnerabilidad de ejecución remota de código en entornos Linux.\n- Afectación directa a servidores corporativos y arquitecturas cloud.\n- Disponibilidad inmediata de parches de mitigación y actualizaciones del kernel.",
+    "summary": "Equipos de ciberseguridad identificaron un fallo severo en la gestión de memoria de distribuciones empresariales de Linux. Se emitió un parche de emergencia urgente para mitigar posibles ataques de ejecución remota de código.",
+    "source": "Ars Technica",
+    "url": "https://arstechnica.com/security/linux-zero-day-vulnerability-patch",
+    "imageUrl": "",
+    "category": "Ciberseguridad",
+    "tags": [
+      "Ciberseguridad",
+      "Dev & Cloud",
+      "Linux",
+      "Servidores"
+    ],
+    "important": false,
+    "publishedAt": "2026-09-15T01:24:27.988Z",
+    "createdAt": "2026-09-15T01:24:29.448Z",
+    "updatedAt": "2026-09-15T01:24:29.448Z"
+  },
+  {
+    "id": "news-1789435469230-wrjhh",
+    "title": "Nvidia anuncia una nueva arquitectura de microchips orientada a computación cuántica híbrida",
+    "content": "## Revolución en semiconductores\n\nEn el marco de su conferencia anual para desarrolladores de infraestructura avanzada, Nvidia presentó una arquitectura de hardware inédita que combina el procesamiento tradicional de GPU con unidades de control cuántico de alta velocidad. Este desarrollo pretende acortar los tiempos de cómputo en áreas altamente complejas como la química computacional y la criptografía post-cuántica.\n\n### Impacto en la industria\n\nLos analistas destacan que este movimiento posiciona a la firma un paso adelante en la carrera por dominar la infraestructura de centros de datos de próxima generación, anticipándose a las demandas de supercomputación globales.\n\n### Puntos clave\n- Presentación de arquitectura híbrida GPU-cuántica.\n- Enfoque directo en simulaciones moleculares y ciberseguridad avanzada.\n- Reducción drástica en la latencia de procesamiento para cargas científicas.",
+    "summary": "La compañía tecnológica reveló detalles de su próxima generación de semiconductores diseñados para integrarse con procesadores cuánticos. Este avance busca resolver cuellos de botella en la simulación de materiales y fármacos.",
+    "source": "TechCrunch",
+    "url": "https://techcrunch.com/nvidia-quantum-hybrid-microchips-announcement",
+    "imageUrl": "",
+    "category": "Hardware",
+    "tags": [
+      "Tecnología",
+      "Nvidia",
+      "Hardware",
+      "Semiconductores"
+    ],
+    "important": true,
+    "publishedAt": "2026-09-15T01:24:27.988Z",
+    "createdAt": "2026-09-15T01:24:29.230Z",
+    "updatedAt": "2026-09-15T01:24:29.230Z"
+  },
+  {
+    "id": "news-1789435469007-fkaqe",
+    "title": "Nuevos acuerdos en el Congreso para debatir la reforma fiscal y el presupuesto",
+    "content": "## Panorama parlamentario\n\nEl escenario político en el Congreso muestra signos de dinamismo tras una serie de reuniones informales entre los jefes de bloque oficialistas y opositores dialoguistas. El objetivo central es destrabar la agenda legislativa para lograr media sanción en los proyectos económicos prioritarios antes de que finalice el período ordinario de sesiones.\n\n### Negociaciones clave\n\nLos gobernadores provinciales juegan un rol preponderante en la articulación de los votos necesarios, exigiendo mayores precisiones sobre el reparto de fondos coparticipables y la obra pública en el proyecto de presupuesto.\n\n### Puntos clave\n- Consensos iniciales para habilitar el debate en comisiones.\n- Negociaciones cruzadas entre el oficialismo y gobernadores provinciales.\n- Enfoque prioritario en la ley de presupuesto y proyecciones fiscales.",
+    "summary": "Los bloques legislativos alcanzaron consensos básicos para habilitar el debate sobre las proyecciones presupuestarias y las modificaciones impositivas propuestas por el Poder Ejecutivo. Se espera una semana de intensas negociaciones en comisiones.",
+    "source": "La Nación",
+    "url": "https://www.lanacion.com.ar/politica/congreso-acuerdos-reforma-fiscal-presupuesto",
+    "imageUrl": "",
+    "category": "Argentina",
+    "tags": [
+      "Argentina",
+      "Política",
+      "Congreso",
+      "Economía"
+    ],
+    "important": false,
+    "publishedAt": "2026-09-15T01:24:27.988Z",
+    "createdAt": "2026-09-15T01:24:29.007Z",
+    "updatedAt": "2026-09-15T01:24:29.007Z"
+  },
+  {
+    "id": "news-1789435468506-0qs01",
+    "title": "El Banco Central flexibiliza regulaciones cambiarias para acelerar la liquidación de exportaciones",
+    "content": "## Contexto macroeconómico\n\nEn un esfuerzo por robustecer las reservas internacionales y estabilizar las expectativas cambiarias, el directorio del Banco Central dispuso una serie de flexibilizaciones en el acceso al mercado de cambios para los principales complejos exportadores del país. La medida llega en un momento de transición donde los analistas económicos monitorean de cerca el flujo de liquidaciones del agro y su impacto directo en la brecha cambiaria.\n\n### Implicancias de la medida\n\nLa flexibilización normativa apunta a remover trabas burocráticas que ralentizaban las operaciones de comercio exterior, ofreciendo mayor previsibilidad a los exportadores sin desatender los controles macroprudenciales vigentes.\n\n### Puntos clave\n- Simplificación de trámites para el acceso al Mercado Libre de Cambios (MLC).\n- Incentivo directo para acelerar la liquidación de divisas del sector agroexportador.\n- Monitoreo estricto del impacto en las reservas netas del Banco Central.",
+    "summary": "La entidad monetaria implementó nuevas normativas orientadas a simplificar el acceso al Mercado Libre de Cambios para el sector agroindustrial. La medida busca incentivar el ingreso de divisas en un mes clave para la balanza comercial.",
+    "source": "Ámbito Financiero",
+    "url": "https://www.ambito.com/economia/banco-central-flexibilizacion-cambiaria-exportaciones",
+    "imageUrl": "",
+    "category": "Economía",
+    "tags": [
+      "Argentina",
+      "Economía",
+      "BCRA",
+      "Dólar"
+    ],
+    "important": true,
+    "publishedAt": "2026-09-15T01:24:27.988Z",
+    "createdAt": "2026-09-15T01:24:28.506Z",
+    "updatedAt": "2026-09-15T01:24:28.506Z"
+  },
+  {
     "id": "news-1789426805831-n2xui",
     "title": "Lanzamiento oficial de Kubernetes 1.30 con mejoras críticas en gestión de memoria y seguridad",
     "content": "## Resumen Completo\n\nLa última actualización del orchestrator de contenedores más popular del mercado introduce características muy esperadas por los equipos de DevOps. Entre ellas sobresale la estabilidad mejorada para la asignación dinámica de memoria y nuevas políticas de aislamiento para cargas de trabajo multi-tenant.\n\n### Puntos clave\n- Optimización avanzada en la gestión de memoria RAM.\n- Nuevas políticas nativas de aislamiento y seguridad.\n- Mayor facilidad para migraciones en entornos de nube híbrida.",

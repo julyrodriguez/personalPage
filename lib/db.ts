@@ -57,15 +57,34 @@ const INITIAL_NOTES: Note[] = [];
 const INITIAL_PROGRESS: Record<string, CourseProgress> = {};
 const INITIAL_NEWS: NewsArticle[] = [];
 
+const BACKEND_TASKS_URL = process.env.DATA_PROCESSOR_URL
+  ? `${process.env.DATA_PROCESSOR_URL}/api/personal/tasks`
+  : 'https://apivacas.jariel.com.ar/api/personal/tasks';
+
 // Database Adapter Interface
 export const db = {
-  // TASKS
+  // TASKS (Persistidas en MongoDB a través del backend en VPS)
   getTasks: async (): Promise<Task[]> => {
+    try {
+      const res = await fetch(BACKEND_TASKS_URL, {
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      });
+      if (res.ok) {
+        const tasks = await res.json();
+        if (Array.isArray(tasks)) {
+          writeJsonFile(TASKS_FILE, tasks);
+          return tasks;
+        }
+      }
+    } catch (err) {
+      console.warn('⚠️ [db.ts] Backend MongoDB no disponible para getTasks, usando caché local:', err);
+    }
     return readJsonFile<Task[]>(TASKS_FILE, INITIAL_TASKS);
   },
 
   getTaskById: async (id: string): Promise<Task | null> => {
-    const tasks = readJsonFile<Task[]>(TASKS_FILE, INITIAL_TASKS);
+    const tasks = await db.getTasks();
     return tasks.find((t) => t.id === id) || null;
   },
 
@@ -77,6 +96,26 @@ export const db = {
     status?: TaskStatus;
     category?: string;
   }): Promise<Task> => {
+    try {
+      const res = await fetch(BACKEND_TASKS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        const result = await res.json();
+        const createdTask = result.data?.task || result.task || result;
+        if (createdTask && createdTask.id) {
+          const tasks = readJsonFile<Task[]>(TASKS_FILE, INITIAL_TASKS);
+          tasks.unshift(createdTask);
+          writeJsonFile(TASKS_FILE, tasks);
+          return createdTask;
+        }
+      }
+    } catch (err) {
+      console.warn('⚠️ [db.ts] Backend MongoDB no disponible para createTask, guardando local:', err);
+    }
+
     const tasks = readJsonFile<Task[]>(TASKS_FILE, INITIAL_TASKS);
     const newTask: Task = {
       id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
@@ -95,6 +134,26 @@ export const db = {
   },
 
   updateTask: async (id: string, updates: Partial<Task>): Promise<Task | null> => {
+    try {
+      const res = await fetch(`${BACKEND_TASKS_URL}/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        const tasks = readJsonFile<Task[]>(TASKS_FILE, INITIAL_TASKS);
+        const index = tasks.findIndex((t) => t.id === id);
+        if (index !== -1) {
+          tasks[index] = { ...tasks[index], ...updated };
+          writeJsonFile(TASKS_FILE, tasks);
+        }
+        return updated;
+      }
+    } catch (err) {
+      console.warn('⚠️ [db.ts] Backend MongoDB no disponible para updateTask, usando local:', err);
+    }
+
     const tasks = readJsonFile<Task[]>(TASKS_FILE, INITIAL_TASKS);
     const index = tasks.findIndex((t) => t.id === id);
     if (index === -1) return null;
@@ -109,6 +168,21 @@ export const db = {
   },
 
   deleteTask: async (id: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`${BACKEND_TASKS_URL}/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (res.ok) {
+        const tasks = readJsonFile<Task[]>(TASKS_FILE, INITIAL_TASKS);
+        const filtered = tasks.filter((t) => t.id !== id);
+        writeJsonFile(TASKS_FILE, filtered);
+        return true;
+      }
+    } catch (err) {
+      console.warn('⚠️ [db.ts] Backend MongoDB no disponible para deleteTask, usando local:', err);
+    }
+
     const tasks = readJsonFile<Task[]>(TASKS_FILE, INITIAL_TASKS);
     const filtered = tasks.filter((t) => t.id !== id);
     if (filtered.length === tasks.length) return false;
