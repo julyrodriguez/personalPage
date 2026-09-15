@@ -14,6 +14,8 @@ import {
   ShieldCheck,
   Play,
   RotateCcw,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +39,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
   const heartbeatTimerRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isMountedRef = useRef<boolean>(true);
+  const touchCleanupRef = useRef<(() => void) | null>(null);
 
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('connecting');
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -61,6 +64,11 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
       const { WebLinksAddon } = await import('@xterm/addon-web-links');
 
       // Limpiar terminal previa si existía
+      if (touchCleanupRef.current) {
+        touchCleanupRef.current();
+        touchCleanupRef.current = null;
+      }
+
       if (termInstanceRef.current) {
         try {
           termInstanceRef.current.dispose();
@@ -76,11 +84,13 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
       if (!terminalRef.current) return;
       terminalRef.current.innerHTML = '';
 
-      // 3. Crear instancia Xterm
+      // 3. Crear instancia Xterm con buffer de scrollback amplio
       const term = new Terminal({
         cursorBlink: true,
         cursorStyle: 'bar',
         fontSize: 13,
+        scrollback: 10000,
+        smoothScrollDuration: 120,
         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
         theme: {
           background: '#070b14',
@@ -115,6 +125,49 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
 
       term.open(terminalRef.current);
       fitAddon.fit();
+
+      // Soporte táctil nativo en celular para scrollear hacia arriba/abajo
+      const termEl = terminalRef.current;
+      let touchStartY = 0;
+      let touchStartX = 0;
+
+      const handleTouchStart = (e: TouchEvent) => {
+        if (e.touches.length === 1) {
+          touchStartY = e.touches[0].clientY;
+          touchStartX = e.touches[0].clientX;
+        }
+      };
+
+      const handleTouchMove = (e: TouchEvent) => {
+        if (e.touches.length === 1 && termInstanceRef.current) {
+          const currentY = e.touches[0].clientY;
+          const currentX = e.touches[0].clientX;
+          const deltaY = currentY - touchStartY;
+          const deltaX = currentX - touchStartX;
+
+          // Si el desplazamiento es predominantemente vertical, interceptar scroll
+          if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) >= 8) {
+            if (e.cancelable) {
+              e.preventDefault();
+            }
+            // Cada ~14px de arrastre equivale a 1 línea de scroll
+            const lines = Math.trunc(deltaY / 14);
+            if (lines !== 0) {
+              termInstanceRef.current.scrollLines(-lines);
+              touchStartY = currentY;
+              touchStartX = currentX;
+            }
+          }
+        }
+      };
+
+      termEl.addEventListener('touchstart', handleTouchStart, { passive: true });
+      termEl.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+      touchCleanupRef.current = () => {
+        termEl.removeEventListener('touchstart', handleTouchStart);
+        termEl.removeEventListener('touchmove', handleTouchMove);
+      };
 
       termInstanceRef.current = term;
       fitAddonRef.current = fitAddon;
@@ -260,6 +313,10 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
       if (wsRef.current) {
         wsRef.current.close();
       }
+      if (touchCleanupRef.current) {
+        touchCleanupRef.current();
+        touchCleanupRef.current = null;
+      }
       if (termInstanceRef.current) {
         try {
           termInstanceRef.current.dispose();
@@ -268,9 +325,32 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
     };
   }, [connectTerminal]);
 
-  // Al cambiar pantalla completa, reajustar tamaño
+  // Bloquear scroll de la página cuando la terminal está en pantalla completa
   useEffect(() => {
-    const timer = setTimeout(() => {
+    if (isFullscreen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isFullscreen]);
+
+  // Permitir salir de pantalla completa con la tecla ESC
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
+
+  // Al cambiar pantalla completa, reajustar tamaño inmediatamente y tras la animación CSS
+  useEffect(() => {
+    const handleFit = () => {
       if (fitAddonRef.current && termInstanceRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
         fitAddonRef.current.fit();
         wsRef.current.send(
@@ -281,8 +361,18 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
           })
         );
       }
-    }, 150);
-    return () => clearTimeout(timer);
+    };
+
+    handleFit();
+    const t1 = setTimeout(handleFit, 60);
+    const t2 = setTimeout(handleFit, 200);
+    const t3 = setTimeout(handleFit, 400);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, [isFullscreen]);
 
   // Enviar comando rápido
@@ -311,10 +401,10 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
 
   return (
     <div
-      className={`relative transition-all duration-300 ${
+      className={`transition-all duration-200 ${
         isFullscreen
-          ? 'fixed inset-4 z-50 rounded-2xl shadow-2xl bg-[#070b14] border border-blue-500/40 flex flex-col'
-          : `rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-[#070b14] shadow-md overflow-hidden flex flex-col ${className}`
+          ? 'fixed inset-0 z-[100] h-[100dvh] w-screen bg-[#070b14] flex flex-col sm:inset-3 sm:rounded-2xl sm:h-[calc(100dvh-1.5rem)] sm:w-[calc(100vw-1.5rem)] sm:border sm:border-blue-500/40 shadow-2xl overflow-hidden'
+          : `relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-[#070b14] shadow-md overflow-hidden flex flex-col ${className}`
       }`}
     >
       {/* Terminal Title Bar */}
@@ -406,8 +496,12 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
             onClick={() => setIsFullscreen(!isFullscreen)}
             size="sm"
             variant="ghost"
-            className="h-7 text-xs text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 px-2 rounded-lg cursor-pointer"
-            title={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+            className={`h-7 text-xs px-2 rounded-lg cursor-pointer transition-colors ${
+              isFullscreen
+                ? 'text-cyan-400 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30'
+                : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/80'
+            }`}
+            title={isFullscreen ? 'Salir de pantalla completa (ESC)' : 'Pantalla completa'}
           >
             {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </Button>
@@ -463,13 +557,41 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
       )}
 
       {/* Terminal Viewport Canvas */}
-      <div
-        ref={terminalRef}
-        className={`w-full p-2.5 font-mono overflow-hidden focus:outline-none ${
-          isFullscreen ? 'flex-1 min-h-0' : 'h-[380px] sm:h-[420px]'
-        }`}
-        onClick={() => termInstanceRef.current?.focus()}
-      />
+      <div className={`relative w-full overflow-hidden ${isFullscreen ? 'flex-1 min-h-0' : 'h-[380px] sm:h-[450px]'}`}>
+        <div
+          ref={terminalRef}
+          className="w-full h-full p-2.5 font-mono overflow-hidden focus:outline-none select-text"
+          onClick={() => termInstanceRef.current?.focus()}
+        />
+
+        {/* Floating Quick Scroll Buttons (Subir / Bajar para celular) */}
+        <div className="absolute right-3 bottom-3 flex flex-col gap-1.5 z-20">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              termInstanceRef.current?.scrollPages(-1);
+            }}
+            className="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-90 text-slate-300 hover:text-cyan-300 border border-slate-700/60 shadow-lg flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs"
+            title="Subir página"
+            aria-label="Subir página"
+          >
+            <ChevronUp className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              termInstanceRef.current?.scrollPages(1);
+            }}
+            className="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-90 text-slate-300 hover:text-cyan-300 border border-slate-700/60 shadow-lg flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs"
+            title="Bajar página"
+            aria-label="Bajar página"
+          >
+            <ChevronDown className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
 
       {/* Terminal Footer Info */}
       <div className="flex items-center justify-between px-4 py-1.5 bg-[#060911] border-t border-slate-800/80 text-[11px] text-slate-500 font-mono shrink-0">
