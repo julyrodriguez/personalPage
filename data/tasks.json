@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "title": "Presupuestar pilates",
+    "description": "",
+    "dueDate": "2026-09-15",
+    "priority": "medium",
+    "status": "pending",
+    "category": "Personal",
+    "createdAt": "2026-09-15T01:44:19.070Z",
+    "updatedAt": "2026-09-15T01:44:19.070Z",
+    "id": "6aa8a2f37c4657ebc980475a"
+  }
+]

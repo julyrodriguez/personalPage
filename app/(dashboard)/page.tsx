@@ -4,6 +4,7 @@ import { TaskWidget } from '@/components/dashboard/task-widget';
 import { CaroNailsWidget } from '@/components/dashboard/caro-nails-widget';
 import { NotesWidget } from '@/components/dashboard/notes-widget';
 import { StudyProgressWidget } from '@/components/dashboard/study-progress-widget';
+import { ServerStatusWidget } from '@/components/dashboard/server-status-widget';
 
 export const metadata = {
   title: 'Dashboard Principal | Personal OS',
@@ -37,6 +38,9 @@ export default function DashboardPage() {
           <NotesWidget />
         </div>
       </div>
+
+      {/* 4. Monitor de Servidor VPS & PM2 (CPU, RAM, Disco, Logs en tiempo real) */}
+      <ServerStatusWidget />
     </div>
   );
 }
