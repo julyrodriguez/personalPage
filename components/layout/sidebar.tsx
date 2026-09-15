@@ -15,6 +15,7 @@ import {
   ChevronRight,
   LogOut,
   Newspaper,
+  Server,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -25,6 +26,13 @@ const NAV_ITEMS = [
     href: '/',
     icon: LayoutDashboard,
     description: 'Resumen & Bento Grid',
+  },
+  {
+    name: 'Servidor',
+    href: '/servidor',
+    icon: Server,
+    description: 'Hardware, Logs & Control',
+    badge: 'Live',
   },
   {
     name: 'Cursos',
