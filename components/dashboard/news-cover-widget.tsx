@@ -37,11 +37,18 @@ export function NewsCoverWidget() {
       .finally(() => setLoading(false));
   }, []);
 
-  const formatDate = (isoStr?: string) => {
+  const formatDateTime = (isoStr?: string) => {
     if (!isoStr) return '';
     try {
       const d = new Date(isoStr);
-      return d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+      const now = new Date();
+      const isToday = d.toDateString() === now.toDateString();
+      const timeStr = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+      if (isToday) {
+        return `Hoy ${timeStr} hs`;
+      }
+      const dateStr = d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+      return `${dateStr} • ${timeStr} hs`;
     } catch {
       return '';
     }
@@ -133,7 +140,7 @@ export function NewsCoverWidget() {
 
                   <span className="text-xs text-slate-400 font-mono flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    {formatDate(heroArticle.publishedAt || heroArticle.createdAt)}
+                    {formatDateTime(heroArticle.fetchedAt || heroArticle.publishedAt || heroArticle.createdAt)}
                   </span>
                 </div>
 
@@ -186,7 +193,7 @@ export function NewsCoverWidget() {
                         <span className="font-semibold text-amber-600 dark:text-amber-400 uppercase text-[10px]">
                           {art.category || 'Noticia'}
                         </span>
-                        <span className="font-mono">{formatDate(art.publishedAt || art.createdAt)}</span>
+                        <span className="font-mono">{formatDateTime(art.fetchedAt || art.publishedAt || art.createdAt)}</span>
                       </div>
 
                       <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2">
@@ -236,7 +243,7 @@ export function NewsCoverWidget() {
                     </span>
                   )}
                   <span className="text-xs text-slate-400 font-mono">
-                    • {formatDate(activeArticle.publishedAt || activeArticle.createdAt)}
+                    • {formatDateTime(activeArticle.fetchedAt || activeArticle.publishedAt || activeArticle.createdAt)}
                   </span>
                 </div>
                 <h2 className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">

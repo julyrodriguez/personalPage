@@ -232,13 +232,25 @@ export const db = {
     return current;
   },
 
-  // NEWS ARTICLES
+  // NEWS ARTICLES (Retención automática de 7 días / 1 semana)
   getNews: async (category?: string): Promise<NewsArticle[]> => {
-    const articles = readJsonFile<NewsArticle[]>(NEWS_FILE, INITIAL_NEWS);
-    if (category) {
-      return articles.filter((a) => a.category?.toLowerCase() === category.toLowerCase());
+    const rawArticles = readJsonFile<NewsArticle[]>(NEWS_FILE, INITIAL_NEWS);
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+    const cutoff = Date.now() - SEVEN_DAYS_MS;
+
+    const valid = rawArticles.filter((a) => {
+      const time = new Date(a.fetchedAt || a.publishedAt || a.createdAt).getTime();
+      return !isNaN(time) && time >= cutoff;
+    });
+
+    if (valid.length !== rawArticles.length) {
+      writeJsonFile(NEWS_FILE, valid);
     }
-    return articles;
+
+    if (category) {
+      return valid.filter((a) => a.category?.toLowerCase() === category.toLowerCase());
+    }
+    return valid;
   },
 
   getNewsById: async (id: string): Promise<NewsArticle | null> => {
@@ -256,9 +268,19 @@ export const db = {
     category?: string;
     tags?: string[];
     important?: boolean;
+    fetchedAt?: string;
     publishedAt?: string;
   }): Promise<NewsArticle> => {
-    const articles = readJsonFile<NewsArticle[]>(NEWS_FILE, INITIAL_NEWS);
+    const rawArticles = readJsonFile<NewsArticle[]>(NEWS_FILE, INITIAL_NEWS);
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+    const cutoff = Date.now() - SEVEN_DAYS_MS;
+
+    const valid = rawArticles.filter((a) => {
+      const time = new Date(a.fetchedAt || a.publishedAt || a.createdAt).getTime();
+      return !isNaN(time) && time >= cutoff;
+    });
+
+    const nowIso = new Date().toISOString();
     const newArticle: NewsArticle = {
       id: `news-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       title: data.title,
@@ -270,12 +292,13 @@ export const db = {
       category: data.category || 'General',
       tags: data.tags || [],
       important: data.important ?? true,
-      publishedAt: data.publishedAt || new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      fetchedAt: data.fetchedAt || nowIso,
+      publishedAt: data.publishedAt || nowIso,
+      createdAt: nowIso,
+      updatedAt: nowIso,
     };
-    articles.unshift(newArticle);
-    writeJsonFile(NEWS_FILE, articles);
+    valid.unshift(newArticle);
+    writeJsonFile(NEWS_FILE, valid);
     return newArticle;
   },
 

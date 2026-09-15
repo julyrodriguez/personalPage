@@ -86,15 +86,18 @@ export default function NoticiasPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const formatDate = (isoStr?: string) => {
+  const formatDateTime = (isoStr?: string) => {
     if (!isoStr) return '';
     try {
       const d = new Date(isoStr);
-      return d.toLocaleDateString('es-AR', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      });
+      const now = new Date();
+      const isToday = d.toDateString() === now.toDateString();
+      const timeStr = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+      if (isToday) {
+        return `Hoy ${timeStr} hs`;
+      }
+      const dateStr = d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+      return `${dateStr} • ${timeStr} hs`;
     } catch {
       return '';
     }
@@ -197,7 +200,7 @@ export default function NoticiasPage() {
                   </div>
                   <span className="text-[11px] text-slate-400 flex items-center gap-1 font-mono">
                     <Calendar className="w-3 h-3" />
-                    {formatDate(article.publishedAt || article.createdAt)}
+                    {formatDateTime(article.fetchedAt || article.publishedAt || article.createdAt)}
                   </span>
                 </div>
 
@@ -284,7 +287,7 @@ export default function NoticiasPage() {
                     </span>
                   )}
                   <span className="text-xs text-slate-400 font-mono">
-                    • {formatDate(activeArticle.publishedAt || activeArticle.createdAt)}
+                    • {formatDateTime(activeArticle.fetchedAt || activeArticle.publishedAt || activeArticle.createdAt)}
                   </span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">

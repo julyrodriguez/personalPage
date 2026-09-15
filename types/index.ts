@@ -98,6 +98,7 @@ export interface NewsArticle {
   category?: string;
   tags?: string[];
   important?: boolean;
+  fetchedAt?: string;
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
