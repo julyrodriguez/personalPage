@@ -12,21 +12,45 @@ import {
   CloudLightning,
   CloudSnow,
   CloudDrizzle,
+  Moon,
+  CloudMoon,
   CloudFog,
   MapPin,
+  RefreshCw,
 } from 'lucide-react';
 import { WeatherData } from '@/types';
 
-function getWeatherIcon(desc: string = '', isDay: boolean = true) {
+function getWeatherVisual(desc: string = '', isDay: boolean = true) {
   const d = desc.toLowerCase();
-  if (d.includes('tormenta') || d.includes('eléctrica')) return CloudLightning;
-  if (d.includes('llovizna')) return CloudDrizzle;
-  if (d.includes('lluvia') || d.includes('chubasco')) return CloudRain;
-  if (d.includes('nieve') || d.includes('nevada')) return CloudSnow;
-  if (d.includes('niebla') || d.includes('escarcha')) return CloudFog;
-  if (d.includes('parcialmente') || d.includes('mayormente')) return CloudSun;
-  if (d.includes('nublado')) return Cloud;
-  return isDay ? Sun : SunMedium;
+
+  if (d.includes('tormenta') || d.includes('eléctrica')) {
+    return { Icon: CloudLightning, color: 'text-purple-400' };
+  }
+  if (d.includes('llovizna')) {
+    return { Icon: CloudDrizzle, color: 'text-blue-400' };
+  }
+  if (d.includes('lluvia') || d.includes('chubasco')) {
+    return { Icon: CloudRain, color: 'text-blue-500' };
+  }
+  if (d.includes('nieve') || d.includes('nevada')) {
+    return { Icon: CloudSnow, color: 'text-indigo-300' };
+  }
+  if (d.includes('niebla') || d.includes('escarcha')) {
+    return { Icon: CloudFog, color: 'text-slate-400' };
+  }
+  if (d === 'nublado' || (!d.includes('parcialmente') && !d.includes('mayormente') && d.includes('nublado'))) {
+    return { Icon: Cloud, color: 'text-slate-400' };
+  }
+  if (d.includes('parcialmente') || d.includes('mayormente')) {
+    if (!isDay) {
+      return { Icon: CloudMoon, color: 'text-indigo-300' };
+    }
+    return { Icon: CloudSun, color: 'text-amber-400' };
+  }
+  if (!isDay) {
+    return { Icon: Moon, color: 'text-indigo-400' };
+  }
+  return { Icon: Sun, color: 'text-amber-500' };
 }
 
 function formatDayName(dateStr?: string) {
@@ -45,6 +69,7 @@ export function Header() {
   const [currentDate, setCurrentDate] = useState('');
   const [currentTime, setCurrentTime] = useState('');
   const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [refreshingWeather, setRefreshingWeather] = useState(false);
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -70,16 +95,32 @@ export function Header() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    fetch('/api/weather')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
+  const loadWeather = async () => {
+    setRefreshingWeather(true);
+    try {
+      const res = await fetch('/api/weather');
+      if (res.ok) {
+        const data = await res.json();
         if (data && data.current) setWeather(data);
-      })
-      .catch((e) => console.warn('Error fetching weather in header:', e));
+      }
+    } catch (e) {
+      console.warn('Error fetching weather in header:', e);
+    } finally {
+      setRefreshingWeather(false);
+    }
+  };
+
+  useEffect(() => {
+    loadWeather();
+    // Auto-actualizar cada 10 minutos
+    const interval = setInterval(loadWeather, 10 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  const CurrentIcon = getWeatherIcon(weather?.current?.weatherDescription, weather?.current?.isDay);
+  const { Icon: CurrentIcon, color: currentColor } = getWeatherVisual(
+    weather?.current?.weatherDescription,
+    weather?.current?.isDay ?? true
+  );
   const nextTwoDays = (weather?.daily || []).slice(0, 2);
 
   return (
@@ -117,7 +158,7 @@ export function Header() {
       <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap lg:justify-end border-t lg:border-t-0 pt-2.5 lg:pt-0 border-slate-100 dark:border-slate-800/80">
         {/* Clima Actual */}
         <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-          <CurrentIcon className="w-5 h-5 text-amber-500 shrink-0" />
+          <CurrentIcon className={`w-5 h-5 ${currentColor} shrink-0`} />
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-bold text-slate-900 dark:text-white font-mono">
@@ -126,6 +167,16 @@ export function Header() {
               <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                 {weather?.current?.weatherDescription || 'Clima'}
               </span>
+              <button
+                onClick={loadWeather}
+                disabled={refreshingWeather}
+                title="Actualizar clima ahora"
+                className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-colors ml-0.5"
+              >
+                <RefreshCw
+                  className={`w-3 h-3 ${refreshingWeather ? 'animate-spin text-blue-500' : ''}`}
+                />
+              </button>
             </div>
             <div className="flex items-center gap-1 text-[10px] text-slate-400">
               <MapPin className="w-2.5 h-2.5 text-slate-400" />
@@ -141,7 +192,7 @@ export function Header() {
         {nextTwoDays.length > 0 && (
           <div className="flex items-center gap-1.5">
             {nextTwoDays.map((d) => {
-              const DayIcon = getWeatherIcon(d.weatherDescription, true);
+              const { Icon: DayIcon, color: dayColor } = getWeatherVisual(d.weatherDescription, true);
               return (
                 <div
                   key={d.date}
@@ -151,7 +202,7 @@ export function Header() {
                   <span className="font-semibold text-slate-600 dark:text-slate-300 text-[11px]">
                     {formatDayName(d.date)}
                   </span>
-                  <DayIcon className="w-3.5 h-3.5 text-blue-500" />
+                  <DayIcon className={`w-3.5 h-3.5 ${dayColor}`} />
                   <span className="font-mono text-[11px] text-slate-700 dark:text-slate-300">
                     {d.minTemp}°/{d.maxTemp}°
                   </span>

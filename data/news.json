@@ -1,5 +1,62 @@
 [
   {
+    "id": "news-1789426805831-n2xui",
+    "title": "Lanzamiento oficial de Kubernetes 1.30 con mejoras críticas en gestión de memoria y seguridad",
+    "content": "## Resumen Completo\n\nLa última actualización del orchestrator de contenedores más popular del mercado introduce características muy esperadas por los equipos de DevOps. Entre ellas sobresale la estabilidad mejorada para la asignación dinámica de memoria y nuevas políticas de aislamiento para cargas de trabajo multi-tenant.\n\n### Puntos clave\n- Optimización avanzada en la gestión de memoria RAM.\n- Nuevas políticas nativas de aislamiento y seguridad.\n- Mayor facilidad para migraciones en entornos de nube híbrida.",
+    "summary": "La comunidad de desarrollo de contenedores presentó una nueva versión que optimiza el consumo de recursos en entornos de nube híbrida. Se destacan también los parches de seguridad para la autenticación de servicios.",
+    "source": "The New Stack",
+    "url": "https://thenewstack.io",
+    "imageUrl": "",
+    "category": "Tecnología",
+    "tags": [
+      "kubernetes",
+      "devops",
+      "cloud"
+    ],
+    "important": false,
+    "publishedAt": "2026-09-14T23:00:05.831Z",
+    "createdAt": "2026-09-14T23:00:05.831Z",
+    "updatedAt": "2026-09-14T23:00:05.831Z"
+  },
+  {
+    "id": "news-1789426805713-sxqbi",
+    "title": "OpenAI anuncia avances significativos en razonamiento autónomo para la próxima generación de LLMs",
+    "content": "## Resumen Completo\n\nDurante una presentación exclusiva, los investigadores de OpenAI demostraron cómo los nuevos modelos de lenguaje pueden descomponer problemas abstractos en múltiples pasos lógicos antes de generar una respuesta. Este enfoque reduce drásticamente las alucinaciones y acerca el rendimiento de la IA a estándares expertos en dominios específicos.\n\n### Puntos clave\n- Arquitectura basada en verificación de pasos intermedios.\n- Reducción drástica de alucinaciones en código y matemáticas.\n- Disponibilidad en fase de pruebas para desarrolladores selectos.",
+    "summary": "La compañía reveló detalles sobre arquitecturas orientadas a la resolución compleja de problemas matemáticos y científicos. Estos modelos incorporan nuevas técnicas de auto-corrección durante el proceso de inferencia.",
+    "source": "TechCrunch",
+    "url": "https://techcrunch.com",
+    "imageUrl": "",
+    "category": "Inteligencia Artificial",
+    "tags": [
+      "ia",
+      "openai",
+      "llm"
+    ],
+    "important": true,
+    "publishedAt": "2026-09-14T23:00:05.713Z",
+    "createdAt": "2026-09-14T23:00:05.713Z",
+    "updatedAt": "2026-09-14T23:00:05.713Z"
+  },
+  {
+    "id": "news-1789426805136-27z0d",
+    "title": "El Gobierno avanza con la nueva ley de bases en el Congreso tras intensas negociaciones",
+    "content": "## Resumen Completo\n\nEl Poder Ejecutivo intensificó las tratativas con los gobernadores y legisladores aliados para asegurar los votos necesarios en la Cámara de Diputados. Las modificaciones introducidas en el texto final buscan mitigar el impacto en las economías regionales sin perder el núcleo de ajuste fiscal que demanda el plan económico actual.\n\n### Puntos clave\n- Consensos alcanzados con gobernadores aliados.\n- Modificaciones en el articulado fiscal y laboral.\n- Expectativa de una sesión prolongada en el recinto.",
+    "summary": "El oficialismo logró consensos clave con los bloques dialoguistas para destrabar el tratamiento de los artículos más resistidos. Se espera una sesión maratónica para definir el futuro de las reformas económicas y fiscales.",
+    "source": "La Nación",
+    "url": "https://www.lanacion.com.ar",
+    "imageUrl": "",
+    "category": "Nacional",
+    "tags": [
+      "politica",
+      "argentina",
+      "congreso"
+    ],
+    "important": true,
+    "publishedAt": "2026-09-14T23:00:05.136Z",
+    "createdAt": "2026-09-14T23:00:05.136Z",
+    "updatedAt": "2026-09-14T23:00:05.136Z"
+  },
+  {
     "id": "news-1789421904779-ehc33",
     "title": "Lanzamiento oficial de Linux Kernel 6.12 con soporte crítico para arquitecturas ARM y de tiempo real",
     "content": "## Resumen Completo\n\nLa fundación Linux anunció la disponibilidad general de la versión 6.12 de su kernel, un lanzamiento largamente esperado por la comunidad de infraestructura y sistemas operativos. Entre sus novedades más destacadas se encuentra la fusión del código para la programación de tareas en tiempo real, permitiendo una latencia predecible crucial para aplicaciones industriales y de telecomunicaciones.\n\nAdemás, se han incorporado mejoras sustanciales en la gestión de energía para procesadores ARM y optimizaciones en el subsistema de memoria para arquitecturas x86_64 modernas. Estas mejoras consolidan la posición de Linux como el sistema operativo dominante en la nube y en la nueva generación de dispositivos edge computing.\n\n### Puntos clave\n- Integración formal del parche PREEMPT_RT para tiempo real.\n- Mejoras de rendimiento y eficiencia energética en procesadores ARM.\n- Actualizaciones mayores en controladores de hardware y seguridad.",

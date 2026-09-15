@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import {
   Sun,
+  Moon,
   CloudSun,
+  CloudMoon,
   Cloud,
   CloudRain,
   CloudLightning,
@@ -18,16 +20,32 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { WeatherData } from '@/types';
 
-function getWeatherIcon(code: number, className = 'w-6 h-6') {
-  if (code === 0) return <Sun className={`${className} text-amber-500`} />;
-  if (code === 1 || code === 2) return <CloudSun className={`${className} text-amber-400`} />;
+function getWeatherIcon(code: number, isDay: boolean = true, className = 'w-6 h-6') {
+  if (code === 0) {
+    return isDay ? (
+      <Sun className={`${className} text-amber-500`} />
+    ) : (
+      <Moon className={`${className} text-indigo-400`} />
+    );
+  }
+  if (code === 1 || code === 2) {
+    return isDay ? (
+      <CloudSun className={`${className} text-amber-400`} />
+    ) : (
+      <CloudMoon className={`${className} text-indigo-300`} />
+    );
+  }
   if (code === 3) return <Cloud className={`${className} text-slate-400`} />;
   if ([45, 48].includes(code)) return <CloudFog className={`${className} text-slate-400`} />;
   if ([51, 53, 55].includes(code)) return <CloudDrizzle className={`${className} text-blue-400`} />;
   if ([61, 63, 65, 80, 81, 82].includes(code)) return <CloudRain className={`${className} text-blue-500`} />;
   if ([71, 73, 75].includes(code)) return <CloudSnow className={`${className} text-indigo-300`} />;
   if ([95, 96, 99].includes(code)) return <CloudLightning className={`${className} text-purple-500`} />;
-  return <Sun className={`${className} text-amber-500`} />;
+  return isDay ? (
+    <Sun className={`${className} text-amber-500`} />
+  ) : (
+    <Moon className={`${className} text-indigo-400`} />
+  );
 }
 
 export function WeatherWidget() {
@@ -116,8 +134,14 @@ export function WeatherWidget() {
                 </p>
               </div>
 
-              <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/50 dark:border-amber-900/40 flex items-center justify-center">
-                {getWeatherIcon(data.current.weatherCode, 'w-10 h-10')}
+              <div
+                className={`p-3 rounded-2xl border flex items-center justify-center ${
+                  data.current.isDay
+                    ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200/50 dark:border-amber-900/40'
+                    : 'bg-indigo-50/50 dark:bg-indigo-950/30 border-indigo-200/50 dark:border-indigo-900/40'
+                }`}
+              >
+                {getWeatherIcon(data.current.weatherCode, data.current.isDay, 'w-10 h-10')}
               </div>
             </div>
 
@@ -159,7 +183,7 @@ export function WeatherWidget() {
                       {formatDayName(day.date)}
                     </span>
                     <div className="my-1">
-                      {getWeatherIcon(day.weatherCode, 'w-4 h-4 sm:w-5 sm:h-5')}
+                      {getWeatherIcon(day.weatherCode, true, 'w-4 h-4 sm:w-5 sm:h-5')}
                     </div>
                     <div className="text-[10px] sm:text-[11px] font-semibold text-slate-800 dark:text-slate-200">
                       <span>{day.maxTemp}°</span>
