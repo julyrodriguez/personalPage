@@ -76,6 +76,7 @@ export function ServerStatusWidget() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(30);
   const [logTab, setLogTab] = useState<'pm2' | 'apps'>('pm2');
   const [error, setError] = useState<string | null>(null);
 
@@ -91,6 +92,7 @@ export function ServerStatusWidget() {
         setData(json);
         setLastUpdated(new Date());
         setError(null);
+        setSecondsLeft(30);
       } else {
         setError(json.error || 'Error al obtener estado');
       }
@@ -103,13 +105,37 @@ export function ServerStatusWidget() {
     }
   }, []);
 
-  // Poll every 5 minutes (300,000 ms)
+  // Poll every 30 seconds while the page is open and active
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(() => {
-      fetchStatus();
-    }, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+
+    const timer = setInterval(() => {
+      // Don't count down or poll if user has the tab hidden/minimized
+      if (typeof document !== 'undefined' && document.hidden) return;
+
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          fetchStatus();
+          return 30;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        // When tab is reopened, immediately refresh
+        fetchStatus();
+        setSecondsLeft(30);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [fetchStatus]);
 
   const formatUptime = (seconds: number) => {
@@ -154,14 +180,19 @@ export function ServerStatusWidget() {
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Monitoreo en tiempo real de hardware y PM2 · Auto-sync 5 min
+              Monitoreo en tiempo real de hardware y PM2 · En vivo (cada 30s)
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto">
+          <span className="text-[11px] font-mono px-2 py-1 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1.5 shadow-xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <span>sync en {secondsLeft}s</span>
+          </span>
+
           {lastUpdated && (
-            <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1">
+            <span className="text-[11px] text-slate-400 font-mono hidden sm:flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {lastUpdated.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
             </span>
@@ -395,8 +426,9 @@ export function ServerStatusWidget() {
                     </button>
                   </div>
 
-                  <span className="text-[9px] text-slate-500 font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
-                    5 min sync
+                  <span className="text-[9px] text-emerald-400 font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    30s live
                   </span>
                 </div>
               </div>
