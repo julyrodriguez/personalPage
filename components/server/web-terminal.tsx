@@ -16,6 +16,8 @@ import {
   RotateCcw,
   ChevronUp,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Plus,
   X,
   Clock,
@@ -45,6 +47,7 @@ const QUICK_COMMANDS = [
 
 export function WebTerminal({ className = '' }: WebTerminalProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const termInstanceRef = useRef<any>(null);
   const fitAddonRef = useRef<any>(null);
   const wsRef = useRef<WebSocket | null>(null);
@@ -192,7 +195,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
           const deltaY = currentY - touchStartY;
           const deltaX = currentX - touchStartX;
 
-          // Si el desplazamiento es predominantemente vertical, interceptar scroll
+          // Si el desplazamiento es predominantemente vertical, interceptar scroll vertical
           if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) >= 8) {
             if (e.cancelable) {
               e.preventDefault();
@@ -200,6 +203,16 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
             const lines = Math.trunc(deltaY / 14);
             if (lines !== 0) {
               termInstanceRef.current.scrollLines(-lines);
+              touchStartY = currentY;
+              touchStartX = currentX;
+            }
+          } else if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) >= 8) {
+            // Desplazamiento lateral (scroll horizontal) en celular
+            if (scrollContainerRef.current) {
+              if (e.cancelable) {
+                e.preventDefault();
+              }
+              scrollContainerRef.current.scrollLeft -= deltaX;
               touchStartY = currentY;
               touchStartX = currentX;
             }
@@ -526,6 +539,12 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
     }
   };
 
+  const scrollHorizontal = (delta: number) => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: delta, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div
       className={`transition-all duration-200 ${
@@ -745,23 +764,57 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
         </div>
       )}
 
-      {/* Terminal Viewport Canvas */}
+      {/* Terminal Viewport Canvas con Scroll Lateral */}
       <div className={`relative w-full overflow-hidden ${isFullscreen ? 'flex-1 min-h-0' : 'h-[380px] sm:h-[450px]'}`}>
         <div
-          ref={terminalRef}
-          className="w-full h-full p-2.5 font-mono overflow-hidden focus:outline-none select-text"
-          onClick={() => termInstanceRef.current?.focus()}
-        />
+          ref={scrollContainerRef}
+          className="w-full h-full overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-slate-700/50"
+        >
+          <div
+            ref={terminalRef}
+            className="min-w-[680px] sm:min-w-full h-full p-2.5 font-mono overflow-hidden focus:outline-none select-text"
+            onClick={() => termInstanceRef.current?.focus()}
+          />
+        </div>
 
-        {/* Floating Quick Scroll Buttons (Subir / Bajar para celular) */}
-        <div className="absolute right-3 bottom-3 flex flex-col gap-1.5 z-20">
+        {/* Floating Quick Scroll Controller (Lateral y Vertical para celular) */}
+        <div className="absolute right-3 bottom-3 flex items-center gap-1 z-20 bg-[#090e1a]/90 backdrop-blur-md px-1.5 py-1 rounded-2xl border border-slate-700/70 shadow-xl select-none">
+          {/* Scroll Lateral */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              scrollHorizontal(-180);
+            }}
+            className="w-7 h-7 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-90 text-slate-300 hover:text-cyan-300 border border-slate-700/60 flex items-center justify-center transition-all cursor-pointer"
+            title="Desplazar a la izquierda"
+            aria-label="Desplazar a la izquierda"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              scrollHorizontal(180);
+            }}
+            className="w-7 h-7 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-90 text-slate-300 hover:text-cyan-300 border border-slate-700/60 flex items-center justify-center transition-all cursor-pointer"
+            title="Desplazar a la derecha"
+            aria-label="Desplazar a la derecha"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+
+          <div className="w-[1px] h-4 bg-slate-700/80 mx-0.5" />
+
+          {/* Scroll Vertical */}
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               termInstanceRef.current?.scrollPages(-1);
             }}
-            className="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-90 text-slate-300 hover:text-cyan-300 border border-slate-700/60 shadow-lg flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs"
+            className="w-7 h-7 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-90 text-slate-300 hover:text-cyan-300 border border-slate-700/60 flex items-center justify-center transition-all cursor-pointer"
             title="Subir página"
             aria-label="Subir página"
           >
@@ -773,7 +826,7 @@ export function WebTerminal({ className = '' }: WebTerminalProps) {
               e.stopPropagation();
               termInstanceRef.current?.scrollPages(1);
             }}
-            className="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-90 text-slate-300 hover:text-cyan-300 border border-slate-700/60 shadow-lg flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs"
+            className="w-7 h-7 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-90 text-slate-300 hover:text-cyan-300 border border-slate-700/60 flex items-center justify-center transition-all cursor-pointer"
             title="Bajar página"
             aria-label="Bajar página"
           >
