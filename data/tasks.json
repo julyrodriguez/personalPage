@@ -1,5 +1,38 @@
 [
   {
+    "title": "Arreglar card ig pilates",
+    "description": "",
+    "dueDate": "2026-09-16",
+    "priority": "medium",
+    "status": "pending",
+    "category": "Estudio",
+    "createdAt": "2026-09-16T11:31:36.423Z",
+    "updatedAt": "2026-09-16T11:31:36.423Z",
+    "id": "6aaa7e181bc79c06cdae88b0"
+  },
+  {
+    "title": "Apartado programaciones cine",
+    "description": "",
+    "dueDate": "2026-09-16",
+    "priority": "medium",
+    "status": "pending",
+    "category": "Estudio",
+    "createdAt": "2026-09-16T11:31:28.226Z",
+    "updatedAt": "2026-09-16T11:31:28.226Z",
+    "id": "6aaa7e101bc79c06cdae88af"
+  },
+  {
+    "title": "Apartado pozi cine",
+    "description": "",
+    "dueDate": "2026-09-16",
+    "priority": "medium",
+    "status": "pending",
+    "category": "Estudio",
+    "createdAt": "2026-09-16T11:31:05.059Z",
+    "updatedAt": "2026-09-16T11:31:05.059Z",
+    "id": "6aaa7df91bc79c06cdae88ae"
+  },
+  {
     "title": "Presupuestar pilates",
     "description": "",
     "dueDate": "2026-09-15",
