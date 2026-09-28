@@ -36,6 +36,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { WebTerminal } from '@/components/server/web-terminal';
+import { RemoteDesktop } from '@/components/server/remote-desktop';
 
 interface ServerStatusData {
   success: boolean;
@@ -174,6 +175,7 @@ export default function ServidorPage() {
     message: string;
   } | null>(null);
   const [showShutdownConfirm, setShowShutdownConfirm] = useState(false);
+  const [activeToolTab, setActiveToolTab] = useState<'terminal' | 'vnc'>('terminal');
 
   // Logs States
   const [selectedAppFilter, setSelectedAppFilter] = useState<string>('all');
@@ -631,6 +633,25 @@ export default function ServidorPage() {
                 )}
               </div>
             </div>
+
+            {/* Quick Link to Remote Desktop */}
+            <div className="md:col-span-2 pt-3 mt-1 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 text-slate-300">
+                <Monitor className="w-4 h-4 text-blue-400 shrink-0" />
+                <span>Control gráfico en tiempo real de Windows 11 mediante túnel privado.</span>
+              </div>
+              <Button
+                onClick={() => {
+                  setActiveToolTab('vnc');
+                  document.getElementById('interactive-tools-section')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl gap-2 cursor-pointer w-full sm:w-auto shrink-0 shadow-md shadow-blue-900/30"
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                <span>Abrir Escritorio Remoto</span>
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -878,24 +899,50 @@ export default function ServidorPage() {
         </div>
       </div>
 
-      {/* SECTION 3: WEB TERMINAL INTERACTIVA (EN EL CENTRO) */}
-      <div>
-        <div className="flex items-center justify-between mb-3 px-1">
-          <div className="flex items-center gap-2">
-            <Terminal className="w-4 h-4 text-cyan-500" />
-            <h2 className="text-base font-bold text-slate-900 dark:text-white">
-              Consola Interactiva en Vivo (Web Terminal)
-            </h2>
-            <Badge variant="outline" className="text-[10px] font-mono px-2 py-0 border-cyan-500/30 text-cyan-600 dark:text-cyan-400">
-              SSH PTY
-            </Badge>
+      {/* SECTION 3: INTERACTIVE TOOLS (WEB TERMINAL & ESCRITORIO REMOTO) */}
+      <div id="interactive-tools-section" className="space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-1">
+          {/* Selector de pestañas */}
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 w-fit">
+            <button
+              onClick={() => setActiveToolTab('terminal')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                activeToolTab === 'terminal'
+                  ? 'bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <Terminal className="w-3.5 h-3.5" />
+              <span>Consola Bash (SSH)</span>
+              <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-cyan-500/30 text-cyan-600 dark:text-cyan-400 font-mono">
+                PTY
+              </Badge>
+            </button>
+
+            <button
+              onClick={() => setActiveToolTab('vnc')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                activeToolTab === 'vnc'
+                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <Monitor className="w-3.5 h-3.5" />
+              <span>Escritorio Remoto (Windows 11)</span>
+              <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-blue-500/30 text-blue-600 dark:text-blue-400 font-mono">
+                noVNC
+              </Badge>
+            </button>
           </div>
+
           <span className="text-xs text-slate-400 font-mono hidden sm:inline">
-            Sesión Bash interactiva con usuario julian
+            {activeToolTab === 'terminal'
+              ? 'Sesión Bash interactiva con usuario julian'
+              : 'Control gráfico en vivo hacia 100.127.136.115:5900'}
           </span>
         </div>
 
-        <WebTerminal />
+        {activeToolTab === 'terminal' ? <WebTerminal /> : <RemoteDesktop />}
       </div>
 
       {/* SECTION 4: PM2 PROCESSES */}

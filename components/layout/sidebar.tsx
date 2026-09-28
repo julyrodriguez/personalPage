@@ -17,6 +17,7 @@ import {
   Newspaper,
   Server,
   Network,
+  Monitor,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -34,6 +35,13 @@ const NAV_ITEMS = [
     icon: Server,
     description: 'Hardware, Logs & Control',
     badge: 'Live',
+  },
+  {
+    name: 'Escritorio Remoto',
+    href: '/escritorio-remoto',
+    icon: Monitor,
+    description: 'Windows 11 noVNC',
+    badge: '100.127.136.115',
   },
   {
     name: 'System Design',
