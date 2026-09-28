@@ -13,7 +13,7 @@ const VIEW_KEY = "sdt:palette-view";
 type View = "grid" | "list";
 type Entry = { id: string; name: string; category: Category; hint: string };
 
-const USERS: Entry = { id: "users", name: "Users", category: "client", hint: "Traffic source" };
+const USERS: Entry = { id: "users", name: "Usuarios", category: "client", hint: "Origen del tráfico de usuarios" };
 
 const PROVIDERS: { id: Exclude<Provider, "generic">; label: string; accent: string }[] = [
   { id: "aws", label: "AWS", accent: "border-aws text-ink" },
@@ -117,8 +117,8 @@ export function Palette({ onAdd, onClose, initialProvider = "aws" }: {
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="space-y-3 px-4 pt-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">Components</h2>
-          <button onClick={onClose} title="Hide components" className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-ink">
+          <h2 className="text-sm font-semibold">Componentes</h2>
+          <button onClick={onClose} title="Ocultar componentes" className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-ink">
             <PanelLeftClose className="size-4" />
           </button>
         </div>
@@ -128,11 +128,11 @@ export function Palette({ onAdd, onClose, initialProvider = "aws" }: {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search services"
+            placeholder="Buscar servicios..."
             className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
           />
           {query && (
-            <button onClick={() => setQuery("")} title="Clear search" className="text-zinc-400 hover:text-ink">
+            <button onClick={() => setQuery("")} title="Borrar búsqueda" className="text-zinc-400 hover:text-ink">
               <X className="size-3.5" />
             </button>
           )}
@@ -153,10 +153,10 @@ export function Palette({ onAdd, onClose, initialProvider = "aws" }: {
             ))}
           </div>
           <div className="flex pb-1.5">
-            <ViewButton active={view === "grid"} title="Grid view" onClick={() => changeView("grid")}>
+            <ViewButton active={view === "grid"} title="Vista cuadrícula" onClick={() => changeView("grid")}>
               <LayoutGrid className="size-4" />
             </ViewButton>
-            <ViewButton active={view === "list"} title="List view" onClick={() => changeView("list")}>
+            <ViewButton active={view === "list"} title="Vista lista" onClick={() => changeView("list")}>
               <List className="size-4" />
             </ViewButton>
           </div>
@@ -165,7 +165,7 @@ export function Palette({ onAdd, onClose, initialProvider = "aws" }: {
 
       <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-4 pt-2">
         {entries.length === 0 ? (
-          <p className="px-2 py-6 text-center text-sm text-zinc-400">No services match “{query}”.</p>
+          <p className="px-2 py-6 text-center text-sm text-zinc-400">No se encontraron servicios para “{query}”.</p>
         ) : view === "grid" ? (
           <div className="grid grid-cols-3 gap-1">
             {entries.map((e) => (

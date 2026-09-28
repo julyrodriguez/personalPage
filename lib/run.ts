@@ -62,16 +62,16 @@ function judge(
   // that gets cut off still counts as lost.
   const lost = [...before].filter((tier) => tier !== "cache" && !remaining.has(tier));
   const cacheLost = before.has("cache") && !remaining.has("cache");
-  const fallback = cacheLost ? "Cache lost, reads fall back to the database. " : "";
+  const fallback = cacheLost ? "Caché caído: las lecturas recaen en la base de datos. " : "";
   if (lost.length > 0) {
     // Name what actually failed; the other lost tiers are just cut off behind it.
     const failed = afterNodes
       .filter((n) => n.data.failed && !["idle", "down"].includes(baseline.nodes[n.id]?.status ?? "idle"))
       .map((n) => nodeName(n.data));
     const cutOff = lost.filter((tier) => !afterNodes.some((n) => n.data.failed && categoryOf(n) === tier));
-    const cause = failed.length ? `${failed.join(" and ")} went down` : `No ${lost.map((t) => CATEGORY_LABELS[t]).join(", ")} left`;
-    const tail = cutOff.length ? `, cutting off ${cutOff.map((t) => CATEGORY_LABELS[t]).join(", ")}` : "";
-    return { verdict: "down", detail: `${cause}${tail}. The system is down.` };
+    const cause = failed.length ? `${failed.join(" y ")} se cayeron` : `No quedan ${lost.map((t) => CATEGORY_LABELS[t]).join(", ")}`;
+    const tail = cutOff.length ? `, aislando a ${cutOff.map((t) => CATEGORY_LABELS[t]).join(", ")}` : "";
+    return { verdict: "down", detail: `${cause}${tail}. El sistema está caído.` };
   }
 
   if (after.supportedUsers < demand) {
@@ -79,12 +79,12 @@ function judge(
     const util = bottleneck ? after.nodes[bottleneck.id].utilization : 0;
     return {
       verdict: "degraded",
-      detail: `${fallback}Serves ~${formatUsers(after.supportedUsers)} of ${formatUsers(demand)} users. ${
-        bottleneck ? `${nodeName(bottleneck.data)} at ${Math.round(util * 100)}%.` : ""
+      detail: `${fallback}Soporta ~${formatUsers(after.supportedUsers)} de ${formatUsers(demand)} usuarios. ${
+        bottleneck ? `${nodeName(bottleneck.data)} al ${Math.round(util * 100)}%.` : ""
       }`,
     };
   }
-  return { verdict: "survives", detail: `${fallback}Still serves up to ~${formatUsers(after.supportedUsers)} users.` };
+  return { verdict: "survives", detail: `${fallback}Sigue soportando hasta ~${formatUsers(after.supportedUsers)} usuarios.` };
 }
 
 function formatUsers(value: number): string {
@@ -133,8 +133,8 @@ export function runTests(nodes: GraphNode[], edges: GraphEdge[], scenario: Scena
   failures.push(
     scenarioResult(
       "az-outage",
-      "Availability zone outage",
-      `One of ${ZONES} AZs goes dark. Single-AZ components die; multi-AZ ones lose the units in that zone (up to a third).`,
+      "Caída de Zona de Disponibilidad (AZ)",
+      `Una de las ${ZONES} AZs queda fuera de servicio. Los componentes Single-AZ caen; los Multi-AZ pierden hasta un tercio de su capacidad.`,
       nodes.map((n) => {
         if (!isSelfManaged(n)) return n;
         if (!n.data.multiAz) return { ...n, data: { ...n.data, failed: true } };
@@ -154,8 +154,8 @@ export function runTests(nodes: GraphNode[], edges: GraphEdge[], scenario: Scena
     });
     return scenarioResult(
       "single-failure",
-      "Worst single failure",
-      `One ${nodeName(victim.data)} ${victim.data.units > 1 ? "instance" : "node"} crashes.`,
+      "Peor falla individual",
+      `Cae una ${victim.data.units > 1 ? "instancia" : "nodo"} de ${nodeName(victim.data)}.`,
       afterNodes
     );
   });
@@ -168,8 +168,8 @@ export function runTests(nodes: GraphNode[], edges: GraphEdge[], scenario: Scena
     failures.push(
       scenarioResult(
         "cold-cache",
-        "Cache restarts cold",
-        "The cache is flushed: every read misses and goes to the database until it warms up.",
+        "Reinicio de caché en frío",
+        "El caché se vacía completamente: todas las lecturas van directo a la base de datos hasta calentarse.",
         nodes.map((n) => (categoryOf(n) === "cache" ? { ...n, data: { ...n.data, hitRate: 0 } } : n))
       )
     );
@@ -178,8 +178,8 @@ export function runTests(nodes: GraphNode[], edges: GraphEdge[], scenario: Scena
   failures.push(
     scenarioResult(
       "spike",
-      `${SPIKE_FACTOR}× traffic spike`,
-      "A launch or viral moment brings ten times the usual users at peak.",
+      `Pico de tráfico ${SPIKE_FACTOR}×`,
+      "Un lanzamiento o momento viral multiplica por 10 los usuarios pico habituales.",
       nodes,
       users * SPIKE_FACTOR
     )

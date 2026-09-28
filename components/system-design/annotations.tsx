@@ -87,7 +87,7 @@ export function TextNodeView({ id, data, selected }: NodeProps<TextNode>) {
       <textarea
         ref={inputRef}
         value={value}
-        placeholder="Type a note"
+        placeholder="Escribe una nota…"
         onChange={(e) => setValue(e.target.value)}
         onBlur={finish}
         onKeyDown={(e) => {
@@ -101,7 +101,7 @@ export function TextNodeView({ id, data, selected }: NodeProps<TextNode>) {
   return (
     <div
       onDoubleClick={() => setEditing(true)}
-      title="Double-click to edit"
+      title="Doble clic para editar"
       className={`max-w-md whitespace-pre-wrap rounded-md px-1.5 py-1 text-base text-ink ${selected ? "outline outline-2 outline-[#6d5bd0]" : ""}`}
     >
       {data.text}

@@ -25,7 +25,7 @@ export function RankBadge({ progress }: { progress: Progress }) {
       <div className="flex items-baseline justify-between gap-3 text-sm">
         <span className="font-semibold">{rank.title}</span>
         <span className="text-xs text-muted-foreground">
-          {xp} XP{rank.next && ` · ${rank.next.xp - xp} to ${rank.next.title}`}
+          {xp} XP{rank.next && ` · ${rank.next.xp - xp} para ${rank.next.title}`}
         </span>
       </div>
       <ProgressBar value={pct} className="mt-1.5 h-1.5 *:data-[slot=progress-indicator]:bg-amber-400" />
@@ -48,9 +48,9 @@ export function LevelSelect({ progress, currentLevelId, onPlay, onFreePlay }: Pr
       <div className="mx-auto max-w-5xl px-6 py-8">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">System design levels</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Niveles de System Design</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Build the architecture, press Run to test it, and earn up to 3 stars per level. {earned}/{LEVELS.length * 3} stars.
+              Diseñá la arquitectura, presioná Probar (Run) para evaluarla y ganá hasta 3 estrellas por nivel. {earned}/{LEVELS.length * 3} estrellas.
             </p>
           </div>
           <div className="flex items-center gap-4">
@@ -65,8 +65,8 @@ export function LevelSelect({ progress, currentLevelId, onPlay, onFreePlay }: Pr
           >
             <Pencil className="size-5 shrink-0 text-muted-foreground" />
             <div>
-              <div className="text-sm font-semibold">Free play</div>
-              <div className="text-xs text-muted-foreground">Open whiteboard with the 1M-user web app scenario. No objectives, no stars.</div>
+              <div className="text-sm font-semibold">Modo Libre (Sandbox)</div>
+              <div className="text-xs text-muted-foreground">Lienzo abierto con el escenario de 1M de usuarios. Sin objetivos obligatorios ni límites.</div>
             </div>
           </button>
         </div>
@@ -76,7 +76,7 @@ export function LevelSelect({ progress, currentLevelId, onPlay, onFreePlay }: Pr
           return (
             <section key={chapter.number} className="mt-8">
               <div className="flex items-baseline gap-3">
-                <Badge variant="secondary">Chapter {chapter.number}</Badge>
+                <Badge variant="secondary">Capítulo {chapter.number}</Badge>
                 <span className="text-sm font-semibold">{chapter.title}</span>
                 <span className="text-xs text-muted-foreground">{chapter.blurb}</span>
               </div>
@@ -96,16 +96,16 @@ export function LevelSelect({ progress, currentLevelId, onPlay, onFreePlay }: Pr
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-muted-foreground">Level {number}</span>
+                        <span className="text-xs font-medium text-muted-foreground">Nivel {number}</span>
                         {unlocked ? <Stars count={stars} /> : <Lock className="size-4 text-muted-foreground" />}
                       </div>
                       <div className="mt-1 font-semibold">{level.title}</div>
                       <p className="mt-1 line-clamp-3 text-xs text-muted-foreground">{level.brief}</p>
                       <div className="mt-auto flex items-center justify-between pt-3 text-[11px] text-muted-foreground">
-                        <span>{level.scenario.dailyActiveUsers.toLocaleString("en-US")} daily users</span>
+                        <span>{level.scenario.dailyActiveUsers.toLocaleString("es-AR")} usuarios diarios</span>
                         {level.reference && (
                           <span className="flex items-center gap-1 text-azure">
-                            <BookOpen className="size-3" /> Azure reference
+                            <BookOpen className="size-3" /> Referencia Azure
                           </span>
                         )}
                       </div>

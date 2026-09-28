@@ -42,7 +42,7 @@ export const CustomIcon = Puzzle;
 export const PROVIDER_STYLES = {
   aws: { label: "AWS", className: "bg-aws/10 text-aws" },
   azure: { label: "Azure", className: "bg-azure/10 text-azure" },
-  generic: { label: "Generic", className: "bg-zinc-100 text-zinc-600" },
+  generic: { label: "Genérico", className: "bg-zinc-100 text-zinc-600" },
 } as const;
 
 export const STATUS_STYLES = {

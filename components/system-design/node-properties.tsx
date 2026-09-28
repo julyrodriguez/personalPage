@@ -52,14 +52,14 @@ export function UsersProperties() {
   if (usersLocked) {
     return (
       <p className="text-xs text-zinc-600">
-        <span className="font-medium">{users.toLocaleString("en-US")}</span> daily active users. The level sets this number.
+        <span className="font-medium">{users.toLocaleString("es-AR")}</span> usuarios activos diarios. El nivel fija este valor.
       </p>
     );
   }
   return (
     <div className="space-y-2">
       <label className="block text-xs font-medium text-zinc-600">
-        Daily active users
+        Usuarios activos diarios
         <input
           type="number"
           min={1000}
@@ -96,7 +96,7 @@ export function NodeProperties({ id, data, item, sim }: { id: string; data: Desi
 
       {carriesLoad && Number.isFinite(item.unitRps) && (
         <Slider
-          label={`Units (${item.unitLabel})`}
+          label={`Unidades (${item.unitLabel})`}
           value={data.units}
           display={String(data.units)}
           min={1}
@@ -107,7 +107,7 @@ export function NodeProperties({ id, data, item, sim }: { id: string; data: Desi
 
       {item.category === "cache" && (
         <Slider
-          label="Cache hit rate"
+          label="Tasa de aciertos (Hit rate)"
           value={data.hitRate}
           display={`${Math.round(data.hitRate * 100)}%`}
           min={0}
@@ -120,50 +120,50 @@ export function NodeProperties({ id, data, item, sim }: { id: string; data: Desi
       {!item.managed && carriesLoad && (
         <label className="flex items-center gap-2 text-xs">
           <input type="checkbox" checked={data.multiAz} onChange={(e) => update({ multiAz: e.target.checked })} className="nodrag accent-ink" />
-          Spread across availability zones
+          Distribuir en múltiples Zonas de Disponibilidad (Multi-AZ)
         </label>
       )}
       {active && carriesLoad && (
         <div className="grid grid-cols-3 gap-1.5">
-          <Stat label="Reads" value={`${formatNumber(sim.load.reads)} rps`} />
-          <Stat label="Writes" value={`${formatNumber(sim.load.writes)} rps`} />
-          <Stat label="Utilization" value={`${Math.round(sim.utilization * 100)}%`} className={STATUS_STYLES[sim.status].text} />
+          <Stat label="Lecturas" value={`${formatNumber(sim.load.reads)} rps`} />
+          <Stat label="Escrituras" value={`${formatNumber(sim.load.writes)} rps`} />
+          <Stat label="Utilización" value={`${Math.round(sim.utilization * 100)}%`} className={STATUS_STYLES[sim.status].text} />
           <Stat
-            label="Supports"
-            value={Number.isFinite(sim.supportedUsers) ? `${formatNumber(sim.supportedUsers)} users` : "No limit"}
+            label="Capacidad máx."
+            value={Number.isFinite(sim.supportedUsers) ? `${formatNumber(sim.supportedUsers)} usuarios` : "Sin límite"}
             className={STATUS_STYLES[sim.status].text}
           />
-          <Stat label="Uptime SLA" value={formatPercent(sim.availability)} />
-          <Stat label="Cost*" value={`$${formatNumber(item.monthlyCost * data.units)}/mo`} />
+          <Stat label="SLA Uptime" value={formatPercent(sim.availability)} />
+          <Stat label="Costo est.*" value={`$${formatNumber(item.monthlyCost * data.units)}/mes`} />
         </div>
       )}
 
       <section className="space-y-2.5 border-t border-line pt-3">
-        <h4 className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Where these numbers come from</h4>
+        <h4 className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">De dónde salen estos valores</h4>
         {carriesLoad && (
           <SourcedValue
-            label={item.unitWriteRps ? "Reads per unit" : "Capacity per unit"}
+            label={item.unitWriteRps ? "Lecturas por unidad" : "Capacidad por unidad"}
             value={Number.isFinite(item.unitRps) ? `${formatNumber(item.unitRps)}/s` : "—"}
             source={item.capacitySource}
           />
         )}
         {carriesLoad && item.unitWriteRps && item.writeSource && (
           <SourcedValue
-            label={item.writesScale ? "Writes per unit" : "Writes (primary only)"}
+            label={item.writesScale ? "Escrituras por unidad" : "Escrituras (sólo primaria)"}
             value={`${formatNumber(item.unitWriteRps)}/s`}
             source={item.writeSource}
           />
         )}
         <SourcedValue
-          label="Uptime SLA"
+          label="SLA de Uptime"
           value={item.slaMultiAz && !item.managed ? `${formatPercent(item.sla)} · ${formatPercent(item.slaMultiAz)} multi-AZ` : formatPercent(item.sla)}
           source={item.slaSource}
         />
-        <SourcedValue label="*Cost" value={`$${formatNumber(item.monthlyCost)}/unit`} source={COST_SOURCE} />
+        <SourcedValue label="*Costo" value={`$${formatNumber(item.monthlyCost)}/unidad`} source={COST_SOURCE} />
       </section>
 
       <button onClick={() => deleteNode(id)} className="flex items-center gap-1.5 text-xs text-over hover:underline">
-        <Trash2 className="size-3.5" /> Remove component
+        <Trash2 className="size-3.5" /> Eliminar componente
       </button>
     </div>
   );

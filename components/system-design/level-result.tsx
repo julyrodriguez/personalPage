@@ -15,7 +15,7 @@ type Props = {
 
 export function LevelResultModal({ level, result, xpGained, rankUp, nextLevel, onNext, onClose }: Props) {
   const cleared = result.stars > 0;
-  const headline = !cleared ? "Not yet" : result.stars === 3 ? "Perfect design" : result.stars === 2 ? "Great work" : "Level cleared";
+  const headline = !cleared ? "Aún falta ajustar" : result.stars === 3 ? "¡Diseño perfecto!" : result.stars === 2 ? "¡Gran trabajo!" : "¡Nivel superado!";
 
   return (
     <div className="absolute inset-0 z-30 flex items-center justify-center bg-ink/20 p-4" onClick={onClose}>
@@ -34,10 +34,10 @@ export function LevelResultModal({ level, result, xpGained, rankUp, nextLevel, o
           {cleared
             ? xpGained > 0
               ? `+${xpGained} XP`
-              : "No new stars this time. Your best score is kept."
-            : "Some required objectives failed. Check the run results, fix the design and run again."}
+              : "Sin nuevas estrellas esta vez. Se conserva tu mejor puntaje."
+            : "Algunos objetivos obligatorios no pasaron. Revisá los resultados, ajustá tu arquitectura y probá nuevamente."}
         </p>
-        {rankUp && <p className="mt-2 rounded-lg bg-amber-50 py-1.5 text-center text-sm font-medium text-amber-900">Promoted to {rankUp}!</p>}
+        {rankUp && <p className="mt-2 rounded-lg bg-amber-50 py-1.5 text-center text-sm font-medium text-amber-900">¡Ascendido a {rankUp}!</p>}
 
         <ul className="mt-4 space-y-1.5">
           {result.objectives.map((o) => (
@@ -58,18 +58,18 @@ export function LevelResultModal({ level, result, xpGained, rankUp, nextLevel, o
           >
             <BookOpen className="size-4 shrink-0 text-azure" />
             <span>
-              Compare with Microsoft's reference: <span className="font-medium">{level.reference.title}</span>
+              Comparar con referencia de Microsoft: <span className="font-medium">{level.reference.title}</span>
             </span>
           </a>
         )}
 
         <div className="mt-5 flex gap-2">
           <button onClick={onClose} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-line py-2 text-sm font-medium hover:bg-zinc-50">
-            <RotateCcw className="size-4" /> {cleared ? "Keep improving" : "Back to the design"}
+            <RotateCcw className="size-4" /> {cleared ? "Seguir optimizando" : "Volver al diseño"}
           </button>
           {cleared && nextLevel && (
             <button onClick={onNext} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-ink py-2 text-sm font-medium text-white">
-              Next level <ArrowRight className="size-4" />
+              Siguiente nivel <ArrowRight className="size-4" />
             </button>
           )}
         </div>

@@ -4,9 +4,9 @@ import { CircleCheck, CircleX, Eye, RotateCcw, TriangleAlert, X } from "lucide-r
 import { formatUsers, type RunReport, type Verdict } from "@/lib/run";
 
 const VERDICTS: Record<Verdict, { label: string; className: string; Icon: typeof CircleCheck }> = {
-  survives: { label: "Survives", className: "bg-ok/10 text-ok", Icon: CircleCheck },
-  degraded: { label: "Degraded", className: "bg-warn/10 text-warn", Icon: TriangleAlert },
-  down: { label: "Down", className: "bg-over/10 text-over", Icon: CircleX },
+  survives: { label: "Sobrevive", className: "bg-ok/10 text-ok", Icon: CircleCheck },
+  degraded: { label: "Degradado", className: "bg-warn/10 text-warn", Icon: TriangleAlert },
+  down: { label: "Caído", className: "bg-over/10 text-over", Icon: CircleX },
 };
 
 type Props = {
@@ -25,16 +25,16 @@ export function RunDrawer({ report, stale, preview, onPreview, onRerun, onClose 
   return (
     <div className="@container absolute inset-x-0 bottom-0 z-20 flex max-h-[48%] flex-col border-t border-line bg-white shadow-[0_-8px_24px_-12px_rgb(0_0_0/0.15)]">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-line px-4 py-2.5">
-        <h2 className="whitespace-nowrap text-sm font-semibold">Run results</h2>
+        <h2 className="whitespace-nowrap text-sm font-semibold">Resultados de la prueba</h2>
         <span className="text-xs text-zinc-500">
-          Target {formatUsers(report.users)} users · passed {survived} of {report.failures.length} scenarios
+          Objetivo: {formatUsers(report.users)} usuarios · Superó {survived} de {report.failures.length} escenarios
         </span>
-        {stale && <span className="rounded-md bg-warn/10 px-1.5 py-0.5 text-[11px] font-medium text-warn">Design changed since this run</span>}
+        {stale && <span className="rounded-md bg-warn/10 px-1.5 py-0.5 text-[11px] font-medium text-warn">El diseño cambió desde esta prueba</span>}
         <div className="ml-auto flex items-center gap-1">
           <button onClick={onRerun} className="flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-100">
-            <RotateCcw className="size-3.5" /> Run again
+            <RotateCcw className="size-3.5" /> Volver a probar
           </button>
-          <button onClick={onClose} title="Close" className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 hover:text-ink">
+          <button onClick={onClose} title="Cerrar" className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 hover:text-ink">
             <X className="size-4" />
           </button>
         </div>
@@ -42,12 +42,12 @@ export function RunDrawer({ report, stale, preview, onPreview, onRerun, onClose 
 
       <div className="grid min-h-0 flex-1 gap-6 overflow-y-auto p-4 @3xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <section>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Load test: where it breaks</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Prueba de carga: punto de saturación</h3>
           {first ? (
             <>
               <p className="mt-2 text-sm">
-                First failure at <b>{formatUsers(first.users)} users</b> ({(first.users / report.users).toFixed(1)}× target):{" "}
-                <b>{first.name}</b> saturates.
+                Primera falla a los <b>{formatUsers(first.users)} usuarios</b> ({(first.users / report.users).toFixed(1)}× objetivo):{" "}
+                <b>{first.name}</b> se satura.
               </p>
               <ol className="mt-3 space-y-2">
                 {report.breakpoints.map((b, i) => {
@@ -74,13 +74,13 @@ export function RunDrawer({ report, stale, preview, onPreview, onRerun, onClose 
               </ol>
             </>
           ) : (
-            <p className="mt-2 text-sm text-zinc-500">Connect components to Users to put them under load.</p>
+            <p className="mt-2 text-sm text-zinc-500">Conectá componentes a Usuarios para simular carga.</p>
           )}
         </section>
 
         <section>
           <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Failure scenarios <span className="font-normal normal-case tracking-normal">(click one to see it on the canvas)</span>
+            Escenarios de falla <span className="font-normal normal-case tracking-normal">(hacé clic en uno para verlo en el canvas)</span>
           </h3>
           <ul className="mt-2 grid gap-2 @xl:grid-cols-2">
             {report.failures.map((f) => {
@@ -101,7 +101,7 @@ export function RunDrawer({ report, stale, preview, onPreview, onRerun, onClose 
                       </span>
                       {active && (
                         <span className="flex items-center gap-1 text-[11px] text-zinc-500">
-                          <Eye className="size-3.5" /> On canvas
+                          <Eye className="size-3.5" /> En el canvas
                         </span>
                       )}
                     </div>

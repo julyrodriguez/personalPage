@@ -6,12 +6,12 @@ const KEY = "sdt:progress";
 export const XP_PER_STAR = 100;
 
 export const RANKS = [
-  { title: "Intern", xp: 0 },
-  { title: "Junior Engineer", xp: 300 },
-  { title: "Engineer", xp: 900 },
-  { title: "Senior Engineer", xp: 1_500 },
-  { title: "Staff Engineer", xp: 2_100 },
-  { title: "Principal Engineer", xp: 2_700 },
+  { title: "Pasante", xp: 0 },
+  { title: "Ingeniero Junior", xp: 300 },
+  { title: "Ingeniero Semi-Senior", xp: 900 },
+  { title: "Ingeniero Senior", xp: 1_500 },
+  { title: "Staff Architect", xp: 2_100 },
+  { title: "Arquitecto Principal", xp: 2_700 },
 ];
 
 export function loadProgress(): Progress {

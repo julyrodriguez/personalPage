@@ -55,26 +55,26 @@ export type CatalogItem = {
 };
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  client: "Clients",
+  client: "Clientes",
   dns: "DNS",
   cdn: "CDN / Edge",
-  loadBalancer: "Load balancer",
-  apiGateway: "API gateway",
-  compute: "Compute",
+  loadBalancer: "Balanceador de Carga",
+  apiGateway: "API Gateway",
+  compute: "Cómputo / Servidores",
   serverless: "Serverless",
-  realtime: "Real-time",
-  cache: "Cache",
-  sqlDb: "SQL database",
-  nosqlDb: "NoSQL database",
-  queue: "Queue / Stream",
-  objectStorage: "Object storage",
-  search: "Search",
-  monitoring: "Observability",
+  realtime: "Tiempo Real / WebSockets",
+  cache: "Caché",
+  sqlDb: "Base de Datos SQL",
+  nosqlDb: "Base de Datos NoSQL",
+  queue: "Cola / Streaming",
+  objectStorage: "Almacenamiento de Objetos",
+  search: "Búsqueda",
+  monitoring: "Observabilidad & Logs",
 };
 
 export const COST_SOURCE: Source = {
   kind: "assumption",
-  note: "Rough figure for comparing designs, not taken from vendor pricing pages.",
+  note: "Valor estimado para comparar arquitecturas, no es cotización comercial directa.",
 };
 
 const ASSUMED = (note: string): Source => ({ kind: "assumption", note });

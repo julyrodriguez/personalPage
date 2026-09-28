@@ -72,14 +72,14 @@ function CostLabel({ cost, budget }: { cost: number; budget?: number }) {
   const over = budget !== undefined && cost > budget;
   return (
     <div
-      title="Estimated from rough per-unit costs, not vendor pricing pages."
+      title="Estimado a partir de costos unitarios de referencia, no cotizaciones oficiales."
       className={`flex items-baseline gap-1 rounded-lg border bg-white px-2.5 py-1.5 text-sm shadow-sm ${over ? "border-over/40" : "border-line"}`}
     >
-      <span className="text-xs text-zinc-500">Est. cost</span>
+      <span className="text-xs text-zinc-500">Costo est.</span>
       <span className={`font-semibold ${over ? "text-over" : budget !== undefined ? "text-ok" : "text-ink"}`}>
-        ${formatNumber(cost)}/mo
+        ${formatNumber(cost)}/mes
       </span>
-      {budget !== undefined && <span className="text-xs text-zinc-500">of ${formatNumber(budget)}</span>}
+      {budget !== undefined && <span className="text-xs text-zinc-500">de ${formatNumber(budget)}</span>}
     </div>
   );
 }
@@ -363,7 +363,7 @@ function Board() {
                   onClick={() => togglePalette(true)}
                   className="flex items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-600 shadow-sm hover:text-ink"
                 >
-                  <PanelLeftOpen className="size-4" /> Components
+                  <PanelLeftOpen className="size-4" /> Componentes
                 </button>
               )}
               {hydrated && level ? (
@@ -379,7 +379,7 @@ function Board() {
               ) : (
                 hydrated && (
                   <span className="flex items-center gap-2 rounded-lg border border-line bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-600 shadow-sm">
-                    <MapIcon className="size-4" /> Free play
+                    <MapIcon className="size-4" /> Modo Libre
                   </span>
                 )
               )}
@@ -392,10 +392,10 @@ function Board() {
               {rampUsers !== null && (
                 <div className="w-64 rounded-lg border border-line bg-white px-3 py-1.5 shadow-sm">
                   <div className="flex justify-between text-xs">
-                    <span className="text-zinc-500">Load test</span>
+                    <span className="text-zinc-500">Prueba de carga</span>
                     <span>
-                      <span className="font-medium">{formatNumber(rampUsers)} users</span>
-                      <span className="text-zinc-500"> · {formatMultiple(rampUsers / users)} target</span>
+                      <span className="font-medium">{formatNumber(rampUsers)} usuarios</span>
+                      <span className="text-zinc-500"> · {formatMultiple(rampUsers / users)} obj.</span>
                     </span>
                   </div>
                   {/* Log scale from RAMP_FROM× to RAMP_TO× the target, with a tick at 1×. */}
@@ -408,7 +408,7 @@ function Board() {
                   </div>
                   <div className="relative mt-0.5 h-3 text-[10px] text-zinc-400">
                     <span className="absolute -translate-x-1/2" style={{ left: `${rampPosition(1) * 100}%` }}>
-                      target {formatNumber(users)}
+                      objetivo {formatNumber(users)}
                     </span>
                     <span className="absolute right-0">{RAMP_TO}×</span>
                   </div>
@@ -419,7 +419,7 @@ function Board() {
                 disabled={rampUsers !== null}
                 className="flex items-center gap-1.5 rounded-lg bg-ink px-3 py-1.5 text-sm font-medium text-white shadow-sm disabled:opacity-50"
               >
-                <Play className="size-3.5 fill-current" /> {rampUsers !== null ? "Running…" : "Run"}
+                <Play className="size-3.5 fill-current" /> {rampUsers !== null ? "Simulando…" : "Probar (Run)"}
               </button>
             </div>
             <ReactFlow
@@ -463,7 +463,7 @@ function Board() {
             )}
             {nodes.filter(isComponent).length <= 1 && (
               <div className="pointer-events-none absolute inset-x-0 top-20 text-center text-sm text-zinc-400">
-                Drag components from the left, then connect them starting from Users.
+                Arrastrá componentes desde la izquierda y conectalos comenzando desde Usuarios.
               </div>
             )}
             {level && resultModal && (

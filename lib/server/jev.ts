@@ -18,9 +18,9 @@ function getClient(): TypeSafeClient | null {
 /** A user-facing message for a failed Jev call. */
 export function describeJevError(error: unknown): { message: string; status: number } {
   if (error instanceof APIConnectionError) {
-    return { message: "Jev didn't respond in time. Try again in a moment.", status: 504 };
+    return { message: "El evaluador no respondió a tiempo. Intentá nuevamente en unos momentos.", status: 504 };
   }
-  return { message: "Jev request failed. Check the server logs.", status: 502 };
+  return { message: "Error al evaluar la arquitectura. Revisá los registros del servidor.", status: 502 };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -137,14 +137,14 @@ const EXPLANATION_QUESTION = {
 } as const;
 
 export const FOCUS_OPTIONS = {
-  capacity: "Throughput: some tier is over capacity or cannot scale out",
-  caching: "Caching: reads hit the database or origin more than necessary",
-  redundancy: "Redundancy: single points of failure or single-zone components",
-  async: "Asynchronous processing: slow or spiky work should go through queues",
-  data_model: "Data storage: the database choice or partitioning does not fit the workload",
-  edge: "Edge delivery: content should be served closer to users via CDN or DNS routing",
-  observability: "Observability: no way to monitor, alert or debug in production",
-  none: "Nothing important is missing for this scenario",
+  capacity: "Throughput: alguna capa está sobrecargada o no puede escalar horizontalmente",
+  caching: "Caché: las lecturas llegan a la base de datos más de lo necesario",
+  redundancy: "Redundancia: existen puntos únicos de falla (SPOF) o componentes single-AZ",
+  async: "Procesamiento asíncrono: trabajo pesado o en ráfagas debería canalizarse mediante colas",
+  data_model: "Almacenamiento: la elección de base de datos o su particionado no se ajusta a la carga",
+  edge: "Entrega en el Edge: el contenido debería servirse más cerca de los usuarios vía CDN",
+  observability: "Observabilidad: falta monitoreo, métricas o alertas en producción",
+  none: "No falta nada crítico para este escenario",
 } as const;
 
 function describeState(input: EvaluationInput, scenario: Scenario) {

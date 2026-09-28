@@ -6,12 +6,12 @@ export type Tool = "select" | "hand" | "line" | "text";
 
 const GROUPS: { id: Tool; label: string; shortcut: string; hint?: string; Icon: LucideIcon }[][] = [
   [
-    { id: "select", label: "Select", shortcut: "V", Icon: MousePointer2 },
-    { id: "hand", label: "Hand", shortcut: "H", hint: "or hold Space", Icon: Hand },
+    { id: "select", label: "Seleccionar", shortcut: "V", Icon: MousePointer2 },
+    { id: "hand", label: "Mover lienzo", shortcut: "H", hint: "o mantener Espacio", Icon: Hand },
   ],
   [
-    { id: "line", label: "Line", shortcut: "L", Icon: Slash },
-    { id: "text", label: "Text", shortcut: "T", Icon: Type },
+    { id: "line", label: "Línea", shortcut: "L", Icon: Slash },
+    { id: "text", label: "Texto", shortcut: "T", Icon: Type },
   ],
 ];
 

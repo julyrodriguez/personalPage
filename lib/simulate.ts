@@ -278,7 +278,7 @@ function findings(
   const name = (id: string) => nodeName(nodes.find((n) => n.id === id)!.data);
 
   if (sourceCount === 0) {
-    result.push({ severity: "error", message: "Add a Users node: it is where traffic enters the system." });
+    result.push({ severity: "error", message: "Agregá un nodo de Usuarios: es por donde entra el tráfico al sistema." });
     return result;
   }
 
@@ -287,25 +287,25 @@ function findings(
     const item = items.get(node.id);
     const sim = sims[node.id];
     if (!item) {
-      result.push({ severity: "info", nodeId: node.id, message: `"${name(node.id)}" is not classified yet, so it carries no load.` });
+      result.push({ severity: "info", nodeId: node.id, message: `"${name(node.id)}" no está clasificado aún, por lo que no procesa carga.` });
       continue;
     }
     if (item.category === "client") continue;
     if (!reachable.has(node.id)) {
-      result.push({ severity: "info", nodeId: node.id, message: `${item.name} is not connected to the traffic path.` });
+      result.push({ severity: "info", nodeId: node.id, message: `${item.name} no está conectado a la ruta de tráfico.` });
       continue;
     }
     if (sim.status === "over") {
       result.push({
         severity: "error",
         nodeId: node.id,
-        message: `${item.name} runs at ${Math.round(sim.utilization * 100)}% of capacity at peak. Add ${item.unitLabel || "capacity"} or offload traffic before it.`,
+        message: `${item.name} opera al ${Math.round(sim.utilization * 100)}% de su capacidad en pico. Agregá ${item.unitLabel || "capacidad"} o aliviá el tráfico previo.`,
       });
     }
     if (!item.managed && node.data.units < 2 && !node.data.multiAz) {
-      result.push({ severity: "warn", nodeId: node.id, message: `${item.name} is a single point of failure (1 unit, single AZ).` });
+      result.push({ severity: "warn", nodeId: node.id, message: `${item.name} es un punto único de falla (single point of failure: 1 unidad, AZ única).` });
     } else if (!item.managed && ["sqlDb", "cache"].includes(item.category) && !node.data.multiAz) {
-      result.push({ severity: "warn", nodeId: node.id, message: `${item.name} is stateful but not multi-AZ: an AZ outage loses it.` });
+      result.push({ severity: "warn", nodeId: node.id, message: `${item.name} almacena estado pero no es multi-AZ: una caída de AZ lo dejaría inaccesible.` });
     }
   }
 
@@ -313,26 +313,26 @@ function findings(
     const source = items.get(edge.source);
     const target = items.get(edge.target);
     if (source?.category === "client" && target && DATA_STORES.includes(target.category)) {
-      result.push({ severity: "error", nodeId: edge.target, message: `Clients talk to ${target.name} directly. Put an application tier in between.` });
+      result.push({ severity: "error", nodeId: edge.target, message: `Los clientes se comunican directamente con ${target.name} (talk to directly). Colocá una capa de aplicación intermedia.` });
     }
     if (
       (source?.category === "client" || source?.category === "dns") &&
       target?.category === "compute" &&
       (nodes.find((n) => n.id === edge.target)?.data.units ?? 1) > 1
     ) {
-      result.push({ severity: "warn", nodeId: edge.target, message: `Nothing balances traffic across the ${target.name} instances. Add a load balancer.` });
+      result.push({ severity: "warn", nodeId: edge.target, message: `Nada balancea el tráfico (Nothing balances traffic) entre las instancias de ${target.name}. Agregá un balanceador de carga.` });
     }
   }
 
   if (availability < scenario.targetAvailability) {
     result.push({
       severity: "warn",
-      message: `Estimated availability ${formatPercent(availability)} is below the ${formatPercent(scenario.targetAvailability)} target.`,
+      message: `La disponibilidad estimada de ${formatPercent(availability)} está por debajo del objetivo de ${formatPercent(scenario.targetAvailability)}.`,
     });
   }
 
   if (![...items.values()].some((i) => i.category === "monitoring")) {
-    result.push({ severity: "info", message: "No observability: how would you know it is failing?" });
+    result.push({ severity: "info", message: "Sin observabilidad ni monitoreo: ¿cómo sabrías si el sistema está fallando?" });
   }
 
   const order = { error: 0, warn: 1, info: 2 };

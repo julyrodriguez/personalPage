@@ -38,20 +38,20 @@ export function ComponentNode({ id, data, selected, dragging }: NodeProps<Design
       <div className="w-48 rounded-xl border border-line bg-ink px-3 py-2.5 text-white shadow-sm">
         <div className="flex items-center gap-2">
           <Icon className="size-4" />
-          <span className="text-sm font-medium">Users</span>
+          <span className="text-sm font-medium">Usuarios</span>
         </div>
         <div className="mt-1.5 text-xs text-white/70">
-          {formatNumber(users)} DAU target
+          {formatNumber(users)} objetivo DAU
           {simulation.users === users ? (
-            ` · ${formatNumber(simulation.peakRps)} rps peak`
+            ` · pico de ${formatNumber(simulation.peakRps)} rps`
           ) : (
             <div className="text-amber-300">
-              Testing {formatNumber(simulation.users)} users · {formatNumber(simulation.peakRps)} rps
+              Probando {formatNumber(simulation.users)} usuarios · {formatNumber(simulation.peakRps)} rps
             </div>
           )}
         </div>
         <Handle type="source" position={Position.Right} />
-        <PropertiesCard visible={showProperties} title="Users">
+        <PropertiesCard visible={showProperties} title="Usuarios">
           <UsersProperties />
         </PropertiesCard>
       </div>
@@ -72,19 +72,19 @@ export function ComponentNode({ id, data, selected, dragging }: NodeProps<Design
         </div>
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-medium">
-            {item?.name ?? (data.customName || "Custom component")}
+            {item?.name ?? (data.customName || "Componente personalizado")}
           </div>
           <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-zinc-500">
             <span className={`rounded px-1 py-px font-medium ${provider.className}`}>{provider.label}</span>
             <span className="truncate">
-              {item ? CATEGORY_LABELS[item.category] : "Unclassified"}
+              {item ? CATEGORY_LABELS[item.category] : "Sin clasificar"}
             </span>
           </div>
         </div>
         {item && item.category !== "monitoring" && (
           <div className="text-right text-[11px] leading-tight text-zinc-500">
             <div className="font-medium text-ink">×{data.units}</div>
-            {data.multiAz && !item.managed && <div>multi-AZ</div>}
+            {data.multiAz && !item.managed && <div>Multi-AZ</div>}
           </div>
         )}
       </div>
@@ -92,16 +92,16 @@ export function ComponentNode({ id, data, selected, dragging }: NodeProps<Design
       <div className="px-3 pb-2.5 pt-2">
         {data.classifying ? (
           <div className="flex items-center gap-1.5 text-xs text-zinc-500">
-            <Loader2 className="size-3 animate-spin" /> Jev is classifying…
+            <Loader2 className="size-3 animate-spin" /> Jev está clasificando…
           </div>
         ) : !item ? (
-          <div className="text-xs text-zinc-400">Unclassified component</div>
+          <div className="text-xs text-zinc-400">Componente sin clasificar</div>
         ) : sim?.status === "down" ? (
-          <div className="text-xs font-medium text-over">Failed</div>
+          <div className="text-xs font-medium text-over">Falló</div>
         ) : !sim || sim.status === "idle" ? (
-          <div className="text-xs text-zinc-400">Not on the traffic path</div>
+          <div className="text-xs text-zinc-400">Fuera de la ruta de tráfico</div>
         ) : item.category === "monitoring" ? (
-          <div className="text-xs text-zinc-500">Observes the system</div>
+          <div className="text-xs text-zinc-500">Monitorea el sistema</div>
         ) : (
           <>
             <div className="h-1.5 overflow-hidden rounded-full bg-zinc-100">
@@ -110,10 +110,10 @@ export function ComponentNode({ id, data, selected, dragging }: NodeProps<Design
             <div className="mt-1.5 flex items-baseline justify-between text-[11px]">
               <span className={`font-medium ${status.text}`}>
                 {!Number.isFinite(item.unitRps)
-                  ? "No published limit"
+                  ? "Sin límite publicado"
                   : sim.supportedUsers === Infinity
-                    ? "No load"
-                    : `Supports ~${formatNumber(sim.supportedUsers)} users`}
+                    ? "Sin carga"
+                    : `Soporta ~${formatNumber(sim.supportedUsers)} usuarios`}
               </span>
               <span className="text-zinc-500">{Math.round(utilization * 100)}%</span>
             </div>
