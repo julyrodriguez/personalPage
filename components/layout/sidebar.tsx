@@ -16,6 +16,7 @@ import {
   LogOut,
   Newspaper,
   Server,
+  Network,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -33,6 +34,13 @@ const NAV_ITEMS = [
     icon: Server,
     description: 'Hardware, Logs & Control',
     badge: 'Live',
+  },
+  {
+    name: 'System Design',
+    href: '/system-design',
+    icon: Network,
+    description: 'Whiteboard & Simulador',
+    badge: '15 Niveles',
   },
   {
     name: 'Cursos',

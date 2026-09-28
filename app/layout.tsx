@@ -32,7 +32,7 @@ export default function RootLayout({
 
             {/* Main Content Area */}
             <main className="flex-1 md:pl-72 flex flex-col min-w-0 w-full overflow-x-hidden">
-              <div className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+              <div className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto has-[.full-canvas]:max-w-[1720px] has-[.full-canvas]:p-2 sm:has-[.full-canvas]:p-4 lg:has-[.full-canvas]:p-6 transition-all flex flex-col">
                 {children}
               </div>
             </main>
