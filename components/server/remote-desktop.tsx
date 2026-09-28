@@ -8,19 +8,24 @@ import {
   RefreshCw,
   ExternalLink,
   ShieldCheck,
-  Power,
-  Wifi,
+  Globe,
   Keyboard,
-  Info,
+  CheckCircle2,
+  Layers,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface RemoteDesktopProps {
   className?: string;
   defaultFullscreen?: boolean;
 }
+
+const HTTPS_VNC_URL =
+  'https://apivacas.jariel.com.ar/novnc/vnc.html?path=novnc/vnc&autoconnect=true&resize=scale&password=Vnc@2026&reconnect=true';
+
+const TAILSCALE_VNC_URL =
+  'http://100.109.27.9:8085/vnc.html?path=vnc&autoconnect=true&resize=scale&password=Vnc@2026&reconnect=true';
 
 export function RemoteDesktop({ className = '', defaultFullscreen = false }: RemoteDesktopProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -28,19 +33,31 @@ export function RemoteDesktop({ className = '', defaultFullscreen = false }: Rem
 
   const [isFullscreen, setIsFullscreen] = useState(defaultFullscreen);
   const [iframeKey, setIframeKey] = useState(0);
-  const [vncUrl, setVncUrl] = useState<string>('');
-  const [targetHost, setTargetHost] = useState<string>('100.127.136.115');
+  const [connectionMode, setConnectionMode] = useState<'https' | 'tailscale'>('https');
+  const [vncUrl, setVncUrl] = useState<string>(HTTPS_VNC_URL);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Al montar, seleccionar la URL adecuada según el protocolo (HTTPS para evitar mixed content)
   useEffect(() => {
-    // Determinar la URL del proxy noVNC dinámicamente según el host donde se visualiza el dashboard
     if (typeof window !== 'undefined') {
-      const currentHost = window.location.hostname || '100.109.27.9';
-      // easy-novnc corre en el puerto 8085 del servidor Linux
-      const url = `http://${currentHost}:8085/vnc.html?path=vnc&autoconnect=true&resize=scale&password=Vnc@2026&reconnect=true`;
-      setVncUrl(url);
+      const isHttps = window.location.protocol === 'https:';
+      if (isHttps) {
+        setConnectionMode('https');
+        setVncUrl(HTTPS_VNC_URL);
+      } else {
+        // En entorno local HTTP, se puede usar directo o HTTPS
+        setConnectionMode('https');
+        setVncUrl(HTTPS_VNC_URL);
+      }
     }
   }, []);
+
+  const changeMode = (mode: 'https' | 'tailscale') => {
+    setConnectionMode(mode);
+    setIsLoading(true);
+    setVncUrl(mode === 'https' ? HTTPS_VNC_URL : TAILSCALE_VNC_URL);
+    setIframeKey((prev) => prev + 1);
+  };
 
   const handleReload = () => {
     setIsLoading(true);
@@ -95,42 +112,71 @@ export function RemoteDesktop({ className = '', defaultFullscreen = false }: Rem
                 className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px] font-mono flex items-center gap-1 py-0"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Tailscale VNC
+                VNC Activo
               </Badge>
             </div>
             <p className="text-[11px] text-slate-400 font-mono mt-0.5">
-              Host: <span className="text-slate-200">{targetHost}:5900</span> &bull; Gateway Web: <span className="text-slate-200">:8085</span>
+              PC: <span className="text-slate-200">100.127.136.115:5900</span> &bull; Gateway:{' '}
+              <span className="text-slate-200">
+                {connectionMode === 'https' ? 'Cloudflare HTTPS / WSS' : 'Tailscale :8085'}
+              </span>
             </p>
           </div>
         </div>
 
         {/* Acciones */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Selector de modo / Gateway */}
+          <div className="flex items-center p-0.5 rounded-lg bg-slate-900 border border-slate-700/80 text-[11px]">
+            <button
+              onClick={() => changeMode('https')}
+              className={`px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                connectionMode === 'https'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Túnel HTTPS seguro (Sin errores Mixed Content)"
+            >
+              <Globe className="w-3 h-3" />
+              <span>HTTPS (Seguro)</span>
+            </button>
+            <button
+              onClick={() => changeMode('tailscale')}
+              className={`px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                connectionMode === 'tailscale'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Conexión HTTP directa por Tailscale (100.109.27.9:8085)"
+            >
+              <Layers className="w-3 h-3" />
+              <span>Tailscale :8085</span>
+            </button>
+          </div>
+
           {/* Botón Recargar */}
           <Button
             onClick={handleReload}
             variant="outline"
             size="sm"
             className="h-8 px-2.5 rounded-lg border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white text-xs gap-1.5"
-            title="Recargar conexión VNC"
+            title="Recargar sesión de escritorio"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Recargar</span>
           </Button>
 
-          {/* Botón Abrir en nueva ventana */}
-          {vncUrl && (
-            <Button
-              onClick={() => window.open(vncUrl, '_blank', 'noopener,noreferrer')}
-              variant="outline"
-              size="sm"
-              className="h-8 px-2.5 rounded-lg border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white text-xs gap-1.5"
-              title="Abrir en ventana independiente"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Pestaña Completa</span>
-            </Button>
-          )}
+          {/* Botón Abrir en ventana independiente */}
+          <Button
+            onClick={() => window.open(vncUrl, '_blank', 'noopener,noreferrer')}
+            variant="outline"
+            size="sm"
+            className="h-8 px-2.5 rounded-lg border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white text-xs gap-1.5"
+            title="Abrir en ventana independiente"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Pestaña Completa</span>
+          </Button>
 
           {/* Botón Pantalla Completa */}
           <Button
@@ -158,39 +204,38 @@ export function RemoteDesktop({ className = '', defaultFullscreen = false }: Rem
       {/* Contenedor del Iframe de noVNC */}
       <div
         className={`relative w-full bg-black flex items-center justify-center ${
-          isFullscreen ? 'flex-1 h-[calc(100vh-50px)]' : 'h-[620px] sm:h-[720px]'
+          isFullscreen ? 'flex-1 h-[calc(100vh-50px)]' : 'h-[640px] sm:h-[750px]'
         }`}
       >
-        {vncUrl ? (
-          <iframe
-            key={iframeKey}
-            ref={iframeRef}
-            src={vncUrl}
-            onLoad={() => setIsLoading(false)}
-            allow="clipboard-read; clipboard-write; fullscreen"
-            className="w-full h-full border-0"
-            title="Escritorio Remoto Windows 11"
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center p-8 text-center text-slate-400">
-            <RefreshCw className="w-8 h-8 animate-spin text-blue-500 mb-3" />
-            <p className="text-sm">Iniciando pasarela de escritorio remoto...</p>
-          </div>
-        )}
+        <iframe
+          key={iframeKey}
+          ref={iframeRef}
+          src={vncUrl}
+          onLoad={() => setIsLoading(false)}
+          allow="clipboard-read; clipboard-write; fullscreen"
+          className="w-full h-full border-0"
+          title="Escritorio Remoto Windows 11"
+        />
       </div>
 
-      {/* Barra de Tips e Información (solo cuando no está en fullscreen) */}
+      {/* Barra de Tips e Información */}
       {!isFullscreen && (
         <div className="px-4 py-2.5 bg-[#060a12] border-t border-slate-800 text-[11px] text-slate-400 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
             <Keyboard className="w-3.5 h-3.5 text-blue-400 shrink-0" />
             <span>
-              Tip: Desplegá la <strong>barra lateral izquierda</strong> de noVNC para enviar <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-mono border border-slate-700">Ctrl+Alt+Del</kbd>, copiar portapapeles o ajustar la escala.
+              Tip: Desplegá la <strong>barra lateral izquierda</strong> de noVNC para enviar{' '}
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-mono border border-slate-700">
+                Ctrl+Alt+Del
+              </kbd>
+              , portapapeles o ajustar la escala.
             </span>
           </div>
-          <div className="flex items-center gap-2 ml-auto text-slate-500 font-mono text-[10px]">
+          <div className="flex items-center gap-2 ml-auto text-slate-400 font-mono text-[10px]">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Encriptación Tailscale Mesh Activa</span>
+            <span>
+              {connectionMode === 'https' ? 'Túnel HTTPS Cloudflare SSL' : 'Túnel Tailscale WireGuard'}
+            </span>
           </div>
         </div>
       )}
