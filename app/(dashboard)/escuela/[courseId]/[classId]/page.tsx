@@ -42,13 +42,22 @@ export default function ClassReaderPage() {
   const [notesSaved, setNotesSaved] = useState(false);
   const [showHints, setShowHints] = useState(false);
 
+  const parseJsonSafe = async (res: Response) => {
+    try {
+      const text = await res.text();
+      return JSON.parse(text);
+    } catch (_) {
+      return null;
+    }
+  };
+
   const fetchClass = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/escuela/classes/${classId}`);
+      const res = await fetch(`/api/escuela/classes/${classId}`, { cache: 'no-store' });
       if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) {
+        const json = await parseJsonSafe(res);
+        if (json && json.success && json.data) {
           setClassData(json.data);
           setNotes(json.data.checkpoint?.personalNotes || '');
         }

@@ -33,24 +33,33 @@ export default function EscuelaPage() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
+  const parseJsonSafe = async (res: Response) => {
+    try {
+      const text = await res.text();
+      return JSON.parse(text);
+    } catch (_) {
+      return null;
+    }
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
       const [coursesRes, statsRes] = await Promise.all([
-        fetch('/api/escuela/courses'),
-        fetch('/api/escuela/stats'),
+        fetch('/api/escuela/courses', { cache: 'no-store' }),
+        fetch('/api/escuela/stats', { cache: 'no-store' }),
       ]);
 
       if (coursesRes.ok) {
-        const cData = await coursesRes.json();
-        if (cData.success && Array.isArray(cData.data)) {
+        const cData = await parseJsonSafe(coursesRes);
+        if (cData && cData.success && Array.isArray(cData.data)) {
           setCourses(cData.data);
         }
       }
 
       if (statsRes.ok) {
-        const sData = await statsRes.json();
-        if (sData.success) {
+        const sData = await parseJsonSafe(statsRes);
+        if (sData && sData.success && sData.data) {
           setStats(sData.data);
         }
       }
@@ -68,22 +77,32 @@ export default function EscuelaPage() {
   const handleSync = async () => {
     try {
       setSyncing(true);
-      setSyncMessage('Conectando a Alumni Education y analizando nuevos materiales...');
+      setSyncMessage('Conectando con Alumni Education e iniciando sincronización...');
       const res = await fetch('/api/escuela/sync', { method: 'POST' });
-      const data = await res.json();
-      if (data.success) {
-        setSyncMessage(
-          `¡Sincronización completada! ${data.coursesChecked || 0} cursos revisados, ${data.classesGenerated || 0} clases generadas.`
-        );
-        await fetchData();
+      const data = await parseJsonSafe(res);
+
+      if (data && data.success) {
+        setSyncMessage(data.message || 'Sincronización en curso en segundo plano...');
+        
+        // Sondeo cada 3 segundos para ir refrescando la lista a medida que se generan clases
+        let attempts = 0;
+        const interval = setInterval(async () => {
+          attempts++;
+          await fetchData();
+          if (attempts >= 4) {
+            clearInterval(interval);
+            setSyncing(false);
+            setSyncMessage('¡Sincronización completada! Los cursos y clases están actualizados.');
+            setTimeout(() => setSyncMessage(null), 6000);
+          }
+        }, 3000);
       } else {
-        setSyncMessage(`Aviso: ${data.error || 'No se pudo sincronizar'}`);
+        setSyncMessage(`Aviso: ${data?.error || 'No se pudo iniciar la sincronización'}`);
+        setSyncing(false);
       }
     } catch (err: any) {
       setSyncMessage(`Error: ${err.message}`);
-    } finally {
       setSyncing(false);
-      setTimeout(() => setSyncMessage(null), 8000);
     }
   };
 

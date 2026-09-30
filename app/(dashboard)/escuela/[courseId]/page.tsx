@@ -30,13 +30,22 @@ export default function CourseDetailPage() {
   const [course, setCourse] = useState<EscuelaCourseItem | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const parseJsonSafe = async (res: Response) => {
+    try {
+      const text = await res.text();
+      return JSON.parse(text);
+    } catch (_) {
+      return null;
+    }
+  };
+
   const fetchCourse = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/escuela/courses/${courseId}`);
+      const res = await fetch(`/api/escuela/courses/${courseId}`, { cache: 'no-store' });
       if (res.ok) {
-        const json = await res.json();
-        if (json.success) {
+        const json = await parseJsonSafe(res);
+        if (json && json.success) {
           setCourse(json.data);
         }
       }
