@@ -305,10 +305,21 @@ export default function EscuelaPage() {
                       <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700 shadow-2xs">
                         {course.category}
                       </span>
-                      <Badge variant="warning" className="text-[11px] gap-1 font-semibold">
-                        <Award className="w-3 h-3" />
-                        Nivel {course.level || 1}
-                      </Badge>
+                      <div className="flex items-center gap-1.5">
+                        {course.isPending ? (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-purple-500/30 text-purple-600 dark:text-purple-400 bg-purple-500/10">
+                            Anticipado
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10">
+                            Oficial
+                          </span>
+                        )}
+                        <Badge variant="warning" className="text-[10px] gap-1 font-semibold">
+                          <Award className="w-3 h-3" />
+                          Nivel {course.level || 1}
+                        </Badge>
+                      </div>
                     </div>
 
                     <CardTitle className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">

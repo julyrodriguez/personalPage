@@ -179,6 +179,8 @@ export interface EscuelaCourseItem {
   alumniCourseId?: number;
   urlSlug?: string;
   active: boolean;
+  isPending?: boolean;
+  startDate?: string | null;
   lastSyncedAt?: string;
   classes?: EscuelaClassItem[];
 }
