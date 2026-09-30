@@ -115,3 +115,70 @@ export interface SalonAppointment {
   description?: string;
   canceled?: boolean;
 }
+
+export interface EscuelaConsigna {
+  title: string;
+  description: string;
+  stepByStep: string[];
+  expectedOutcome: string;
+}
+
+export interface EscuelaChallenge {
+  title: string;
+  instructions: string;
+  criteria: string[];
+  hints: string[];
+}
+
+export interface EscuelaCheckpoint {
+  classId: string;
+  courseId: string;
+  read: boolean;
+  readAt?: string | null;
+  practiceCompleted: boolean;
+  practiceCompletedAt?: string | null;
+  challengeCompleted: boolean;
+  challengeCompletedAt?: string | null;
+  personalNotes?: string;
+  updatedAt?: string;
+}
+
+export interface EscuelaClassItem {
+  classId: string;
+  courseId: string;
+  calendarId: number;
+  alumniClassId?: number;
+  moduleNumber: number;
+  classNumber: number;
+  title: string;
+  summary: string;
+  rawResources?: any[];
+  markdownContent: string;
+  consignas: EscuelaConsigna[];
+  challenge?: EscuelaChallenge;
+  order: number;
+  generatedAt: string;
+  checkpoint?: EscuelaCheckpoint;
+  prevClass?: { classId: string; title: string; order: number } | null;
+  nextClass?: { classId: string; title: string; order: number } | null;
+}
+
+export interface EscuelaCourseItem {
+  courseId: string;
+  title: string;
+  shortTitle?: string;
+  calendarId: number;
+  description: string;
+  category: string;
+  level: number;
+  totalClasses: number;
+  readCount?: number;
+  practiceCount?: number;
+  challengeCount?: number;
+  progressPercentage?: number;
+  alumniCourseId?: number;
+  urlSlug?: string;
+  active: boolean;
+  lastSyncedAt?: string;
+  classes?: EscuelaClassItem[];
+}

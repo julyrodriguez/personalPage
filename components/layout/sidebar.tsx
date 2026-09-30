@@ -18,6 +18,8 @@ import {
   Server,
   Network,
   Monitor,
+  School,
+  BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -49,6 +51,13 @@ const NAV_ITEMS = [
     icon: Network,
     description: 'Whiteboard & Simulador',
     badge: '15 Niveles',
+  },
+  {
+    name: 'Escuela',
+    href: '/escuela',
+    icon: School,
+    description: 'Campus IT & Clases Diarias',
+    badge: 'Alumni 24h',
   },
   {
     name: 'Cursos',
