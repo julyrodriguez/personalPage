@@ -24,6 +24,8 @@ import {
   CheckCircle2,
   AlertCircle,
   FolderOpen,
+  Archive,
+  ArrowDownToLine,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,6 +33,8 @@ import { Badge } from '@/components/ui/badge';
 
 interface ServerFileItem {
   name: string;
+  relativePath?: string;
+  folder?: string;
   path: string;
   size: number;
   extension: string;
@@ -131,8 +135,15 @@ export default function ArchivosPage() {
     }
   }, []);
 
+  // Carga inicial + auto-refresco cada 5 segundos para detectar al instante archivos puestos desde la terminal
   useEffect(() => {
     fetchFiles();
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        fetchFiles(false);
+      }
+    }, 5000);
+    return () => clearInterval(interval);
   }, [fetchFiles]);
 
   const uploadWithXhr = (url: string, formData: FormData): Promise<any> => {
@@ -179,10 +190,8 @@ export default function ArchivosPage() {
     try {
       let result: any;
       try {
-        // Primero intentamos directo al backend del servidor para evitar límites de tamaño de Vercel
         result = await uploadWithXhr(DIRECT_BACKEND_URL, formData);
       } catch {
-        // Fallback a la ruta local de Next.js (/api/files)
         result = await uploadWithXhr('/api/files', formData);
       }
 
@@ -198,7 +207,7 @@ export default function ArchivosPage() {
         type: 'success',
         message:
           result.message ||
-          `${selected.length} archivo(s) descargado(s) en el servidor en ${serverDir}`,
+          `${selected.length} archivo(s) guardado(s) en el servidor en ${serverDir}`,
       });
     } catch (err: any) {
       setFeedback({
@@ -292,11 +301,11 @@ export default function ArchivosPage() {
     }
   };
 
-  const handleDeleteFile = async (filename: string) => {
-    if (!confirm(`¿Eliminar "${filename}" del servidor?`)) return;
+  const handleDeleteFile = async (relOrName: string) => {
+    if (!confirm(`¿Eliminar "${relOrName}" del servidor?`)) return;
 
     try {
-      const res = await fetch(`/api/files?name=${encodeURIComponent(filename)}`, {
+      const res = await fetch(`/api/files?name=${encodeURIComponent(relOrName)}`, {
         method: 'DELETE',
       });
       const data = await res.json();
@@ -305,7 +314,7 @@ export default function ArchivosPage() {
         setTotalBytes(data.totalBytes || 0);
         setFeedback({
           type: 'success',
-          message: `Archivo "${filename}" eliminado del servidor.`,
+          message: `Archivo "${relOrName}" eliminado del servidor.`,
         });
       } else {
         setFeedback({
@@ -321,9 +330,13 @@ export default function ArchivosPage() {
     }
   };
 
-  const filteredFiles = files.filter((f) =>
-    f.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredFiles = files.filter((f) => {
+    const q = search.toLowerCase();
+    return (
+      f.name.toLowerCase().includes(q) ||
+      (f.relativePath && f.relativePath.toLowerCase().includes(q))
+    );
+  });
 
   return (
     <div className="space-y-6 pb-12">
@@ -335,30 +348,42 @@ export default function ArchivosPage() {
               <FolderUp className="w-5 h-5" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-              Archivos al Servidor
+              Subir & Descargar Archivos
             </h1>
             <Badge
               variant="outline"
-              className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 text-xs font-semibold"
+              className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-xs font-semibold"
             >
-              Transferencia Directa
+              Sincronizado en Vivo
             </Badge>
           </div>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Envía cualquier archivo desde tu navegador o celular para que se descargue y guarde directamente en este servidor.
+            Descarga cualquier archivo que esté en la carpeta del servidor o súbele archivos nuevos desde tu navegador.
           </p>
         </div>
 
-        <Button
-          onClick={() => fetchFiles(true)}
-          disabled={refreshing || loading}
-          size="sm"
-          variant="outline"
-          className="rounded-xl border-slate-200 dark:border-slate-700 gap-1.5 text-xs self-start sm:self-auto"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-blue-500' : ''}`} />
-          <span>{refreshing ? 'Actualizando...' : 'Refrescar lista'}</span>
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          {files.length > 0 && (
+            <a
+              href="/api/files?downloadAll=true"
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl text-xs font-semibold h-9 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-500/20 transition-colors"
+            >
+              <Archive className="w-3.5 h-3.5" />
+              <span>Descargar Todo (.zip)</span>
+            </a>
+          )}
+
+          <Button
+            onClick={() => fetchFiles(true)}
+            disabled={refreshing || loading}
+            size="sm"
+            variant="outline"
+            className="rounded-xl border-slate-200 dark:border-slate-700 gap-1.5 text-xs h-9"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-blue-500' : ''}`} />
+            <span>{refreshing ? 'Actualizando...' : 'Refrescar'}</span>
+          </Button>
+        </div>
       </div>
 
       {/* Prominent Server Path Banner */}
@@ -369,7 +394,7 @@ export default function ArchivosPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-400">
                 <HardDrive className="w-4 h-4" />
-                <span>Ruta de Descarga en este Servidor</span>
+                <span>Ruta Compartida en este Servidor (Subida y Descarga)</span>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -415,18 +440,18 @@ export default function ArchivosPage() {
               </div>
 
               <p className="text-xs text-slate-300">
-                Todo lo que subas acá queda disponible al instante en el disco local del servidor en{' '}
-                <span className="font-mono text-white">{serverDir}/&lt;nombre-archivo&gt;</span>.
+                Cualquier archivo que dejes o copies en{' '}
+                <span className="font-mono text-emerald-300">{serverDir}</span> desde la terminal aparece automáticamente en la lista de abajo para descargarlo.
               </p>
             </div>
 
             <div className="flex items-center gap-4 pt-3 lg:pt-0 border-t lg:border-t-0 border-white/10 shrink-0">
               <div className="px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-center min-w-[100px]">
-                <span className="block text-xs text-slate-400">Archivos</span>
+                <span className="block text-xs text-slate-400">En la carpeta</span>
                 <span className="text-xl font-black text-white">{files.length}</span>
               </div>
               <div className="px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-center min-w-[120px]">
-                <span className="block text-xs text-slate-400">Espacio usado</span>
+                <span className="block text-xs text-slate-400">Tamaño total</span>
                 <span className="text-xl font-black text-emerald-400">
                   {formatBytes(totalBytes)}
                 </span>
@@ -462,15 +487,153 @@ export default function ArchivosPage() {
         </div>
       )}
 
-      {/* Upload & Creation Card */}
+      {/* SECTION 1: DESCARGAR ARCHIVOS DEL SERVIDOR (Todos los archivos en /home/julian/vacas-locas/archivos) */}
+      <Card className="border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+        <CardHeader className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              <ArrowDownToLine className="w-5 h-5" />
+            </div>
+            <div>
+              <CardTitle className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span>Archivos Disponibles para Descargar ({filteredFiles.length})</span>
+              </CardTitle>
+              <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+                Mostrando todos los archivos presentes en <code className="font-mono">{serverDir}</code>
+              </CardDescription>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-72">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                placeholder="Filtrar archivos en esta ruta..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-5">
+          {loading ? (
+            <div className="py-12 text-center text-xs text-slate-400 animate-pulse">
+              Escaneando archivos en {serverDir}...
+            </div>
+          ) : filteredFiles.length === 0 ? (
+            <div className="py-10 px-4 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 space-y-2">
+              <FolderOpen className="w-8 h-8 mx-auto opacity-40" />
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                No hay archivos actualmente en <code className="font-mono">{serverDir}</code>
+              </p>
+              <p className="text-xs max-w-md mx-auto">
+                Sube archivos en el panel de abajo o copia cualquier archivo desde la terminal a{' '}
+                <code className="font-mono text-emerald-600 dark:text-emerald-400">{serverDir}</code> y aparecerá aquí automáticamente para descargarlo.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {filteredFiles.map((file) => {
+                const relPath = file.relativePath || file.name;
+                const fullPath = file.path || `${serverDir}/${relPath}`;
+                const isCopied = copiedKey === `file-${relPath}`;
+
+                return (
+                  <div
+                    key={relPath}
+                    className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-blue-500/40 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col lg:flex-row lg:items-center justify-between gap-3 transition-all"
+                  >
+                    <div className="flex items-start sm:items-center gap-3 min-w-0">
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 shrink-0">
+                        {getFileIcon(file.extension)}
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                            {file.name}
+                          </span>
+                          {file.folder && (
+                            <Badge variant="outline" className="text-[10px] font-mono">
+                              /{file.folder}
+                            </Badge>
+                          )}
+                          <Badge variant="secondary" className="text-[10px] font-mono">
+                            {formatBytes(file.size)}
+                          </Badge>
+                          <span className="text-[11px] text-slate-400 font-mono">
+                            {new Date(file.updatedAt).toLocaleString('es-AR')}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-1">
+                          <code className="text-[11px] font-mono text-slate-600 dark:text-slate-300 bg-slate-200/60 dark:bg-slate-900/80 px-2 py-0.5 rounded-md truncate select-all">
+                            {fullPath}
+                          </code>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 self-end lg:self-center">
+                      <a
+                        href={`/api/files?download=${encodeURIComponent(relPath)}`}
+                        download={file.name}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-xl text-xs font-semibold h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-500/20 transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Descargar</span>
+                      </a>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => copyToClipboard(fullPath, `file-${relPath}`)}
+                        className="rounded-xl text-xs gap-1.5 h-9 cursor-pointer"
+                        title="Copiar ruta absoluta del archivo en el servidor"
+                      >
+                        {isCopied ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-500" />
+                            <span>Copiada</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copiar ruta</span>
+                          </>
+                        )}
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteFile(relPath)}
+                        className="rounded-xl text-xs h-9 px-2.5 text-slate-400 hover:text-rose-600 hover:border-rose-500/30 cursor-pointer"
+                        title="Eliminar del servidor"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* SECTION 2: SUBIR ARCHIVOS AL SERVIDOR */}
       <Card className="border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
         <CardHeader className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <CardTitle className="text-base font-bold text-slate-900 dark:text-white">
-              Enviar Archivos al Servidor
+              Subir Nuevos Archivos a esta Ruta
             </CardTitle>
             <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
-              Elige cómo quieres transferir el archivo a <code className="font-mono">{serverDir}</code>
+              Envía archivos desde tu dispositivo hacia <code className="font-mono">{serverDir}</code>
             </CardDescription>
           </div>
 
@@ -654,131 +817,6 @@ export default function ArchivosPage() {
                 </Button>
               </div>
             </form>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Files List Section */}
-      <Card className="border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
-        <CardHeader className="p-5 pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <FolderOpen className="w-5 h-5 text-blue-500" />
-            <div>
-              <CardTitle className="text-base font-bold text-slate-900 dark:text-white">
-                Archivos Guardados en el Servidor ({filteredFiles.length})
-              </CardTitle>
-              <CardDescription className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                {serverDir}
-              </CardDescription>
-            </div>
-          </div>
-
-          <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              placeholder="Buscar archivo por nombre..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-5">
-          {loading ? (
-            <div className="py-12 text-center text-xs text-slate-400 animate-pulse">
-              Consultando archivos en {serverDir}...
-            </div>
-          ) : filteredFiles.length === 0 ? (
-            <div className="py-12 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400">
-              <FolderUp className="w-8 h-8 mx-auto mb-2 opacity-40" />
-              <p className="text-sm font-medium">No hay archivos en esta carpeta todavía</p>
-              <p className="text-xs mt-1">
-                Sube un archivo arriba y aparecerá aquí con su ruta exacta en el servidor.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              {filteredFiles.map((file) => {
-                const fullPath = file.path || `${serverDir}/${file.name}`;
-                const isCopied = copiedKey === `file-${file.name}`;
-
-                return (
-                  <div
-                    key={file.name}
-                    className="p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col lg:flex-row lg:items-center justify-between gap-3 transition-all"
-                  >
-                    <div className="flex items-start sm:items-center gap-3 min-w-0">
-                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 shrink-0">
-                        {getFileIcon(file.extension)}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                            {file.name}
-                          </span>
-                          <Badge variant="secondary" className="text-[10px] font-mono">
-                            {formatBytes(file.size)}
-                          </Badge>
-                          <span className="text-[11px] text-slate-400 font-mono">
-                            {new Date(file.updatedAt).toLocaleString('es-AR')}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-2 mt-1">
-                          <code className="text-[11px] font-mono text-slate-600 dark:text-slate-300 bg-slate-200/60 dark:bg-slate-900/80 px-2 py-0.5 rounded-md truncate select-all">
-                            {fullPath}
-                          </code>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0 self-end lg:self-center">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => copyToClipboard(fullPath, `file-${file.name}`)}
-                        className="rounded-xl text-xs gap-1.5 h-8 cursor-pointer"
-                        title="Copiar ruta absoluta del archivo en el servidor"
-                      >
-                        {isCopied ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-500" />
-                            <span>Ruta copiada</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5" />
-                            <span>Copiar ruta</span>
-                          </>
-                        )}
-                      </Button>
-
-                      <a
-                        href={`/api/files?download=${encodeURIComponent(file.name)}`}
-                        download={file.name}
-                        className="inline-flex items-center justify-center gap-1.5 rounded-xl text-xs font-medium h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Descargar</span>
-                      </a>
-
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDeleteFile(file.name)}
-                        className="rounded-xl text-xs h-8 px-2.5 text-slate-400 hover:text-rose-600 hover:border-rose-500/30 cursor-pointer"
-                        title="Eliminar del servidor"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           )}
         </CardContent>
       </Card>

@@ -43,8 +43,8 @@ const NAV_ITEMS = [
     name: 'Archivos',
     href: '/archivos',
     icon: FolderUp,
-    description: 'Subir a /vacas-locas/archivos',
-    badge: 'Upload',
+    description: 'Subir & Descargar Archivos',
+    badge: 'Sync',
   },
   {
     name: 'Escritorio Remoto',

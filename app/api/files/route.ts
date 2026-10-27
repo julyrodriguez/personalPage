@@ -22,6 +22,15 @@ function sanitizeFileName(rawName: string): string {
   return cleaned || `archivo_${Date.now()}`;
 }
 
+function resolveSafeServerFilePath(relOrName: string): string {
+  const cleaned = String(relOrName || '').replace(/^[/\\]+/, '');
+  const resolved = path.resolve(SERVER_FILES_DIR, cleaned);
+  if (resolved !== SERVER_FILES_DIR && !resolved.startsWith(SERVER_FILES_DIR + path.sep)) {
+    throw new Error('Ruta fuera del directorio permitido');
+  }
+  return resolved;
+}
+
 function isLocalServerAvailable(): boolean {
   try {
     return fs.existsSync('/home/julian/vacas-locas');
@@ -34,47 +43,84 @@ function listLocalServerFiles() {
   if (!fs.existsSync(SERVER_FILES_DIR)) {
     fs.mkdirSync(SERVER_FILES_DIR, { recursive: true });
   }
-  const entries = fs.readdirSync(SERVER_FILES_DIR, { withFileTypes: true });
-  const files = [];
+  const files: Array<{
+    name: string;
+    relativePath: string;
+    folder: string;
+    path: string;
+    size: number;
+    extension: string;
+    createdAt: string;
+    updatedAt: string;
+  }> = [];
   let totalBytes = 0;
 
-  for (const entry of entries) {
-    if (!entry.isFile()) continue;
-    const fullPath = path.join(SERVER_FILES_DIR, entry.name);
+  function scanDir(currentDir: string) {
+    let entries: fs.Dirent[] = [];
     try {
-      const stat = fs.statSync(fullPath);
-      totalBytes += stat.size;
-      files.push({
-        name: entry.name,
-        path: fullPath,
-        size: stat.size,
-        extension: path.extname(entry.name).toLowerCase().replace('.', '') || 'file',
-        createdAt: (stat.birthtime || stat.mtime).toISOString(),
-        updatedAt: stat.mtime.toISOString(),
-      });
-    } catch {}
+      entries = fs.readdirSync(currentDir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const entry of entries) {
+      const fullPath = path.join(currentDir, entry.name);
+      try {
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) {
+          scanDir(fullPath);
+        } else if (stat.isFile()) {
+          const relativePath = path.relative(SERVER_FILES_DIR, fullPath);
+          totalBytes += stat.size;
+          files.push({
+            name: entry.name,
+            relativePath,
+            folder: path.dirname(relativePath) === '.' ? '' : path.dirname(relativePath),
+            path: fullPath,
+            size: stat.size,
+            extension: path.extname(entry.name).toLowerCase().replace('.', '') || 'file',
+            createdAt: (stat.birthtime || stat.mtime).toISOString(),
+            updatedAt: stat.mtime.toISOString(),
+          });
+        }
+      } catch {}
+    }
   }
 
+  scanDir(SERVER_FILES_DIR);
   files.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   return { files, totalBytes };
 }
 
 export async function GET(request: NextRequest) {
   const downloadName = request.nextUrl.searchParams.get('download');
+  const downloadAll = request.nextUrl.searchParams.get('downloadAll');
 
   // Si está corriendo localmente en este servidor
   if (isLocalServerAvailable()) {
     try {
+      if (downloadAll === 'true') {
+        const res = await fetch('http://127.0.0.1:3000/api/personal/files/download-all');
+        if (res.ok && res.body) {
+          return new NextResponse(res.body, {
+            headers: {
+              'Content-Disposition': 'attachment; filename="archivos-servidor.zip"',
+              'Content-Type': 'application/zip',
+            },
+          });
+        }
+      }
+
       if (downloadName) {
-        const safeName = sanitizeFileName(downloadName);
-        const fullPath = path.join(SERVER_FILES_DIR, safeName);
-        if (!fs.existsSync(fullPath)) {
+        const fullPath = resolveSafeServerFilePath(downloadName);
+        if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isFile()) {
           return NextResponse.json({ success: false, error: 'Archivo no encontrado' }, { status: 404 });
         }
         const fileBuffer = fs.readFileSync(fullPath);
+        const fileName = path.basename(fullPath);
         return new NextResponse(fileBuffer, {
           headers: {
-            'Content-Disposition': `attachment; filename="${encodeURIComponent(safeName)}"`,
+            'Content-Disposition': `attachment; filename="${encodeURIComponent(fileName)}"`,
             'Content-Type': 'application/octet-stream',
           },
         });
@@ -93,14 +139,21 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Si está en Vercel u otro host remoto, consultar a data-processor (apivacas.jariel.com.ar)
+  // Si está en Vercel u otro host remoto, redirigir descargas al dominio público del servidor
+  if (downloadAll === 'true') {
+    return NextResponse.redirect(`${REMOTE_BACKEND_URL}/api/personal/files/download-all`);
+  }
+
+  if (downloadName) {
+    const target = `${REMOTE_BACKEND_URL}/api/personal/files/download?file=${encodeURIComponent(
+      downloadName
+    )}`;
+    return NextResponse.redirect(target);
+  }
+
   const candidates = getCandidates();
   for (const base of candidates) {
     try {
-      if (downloadName) {
-        const target = `${base}/api/personal/files/download/${encodeURIComponent(downloadName)}`;
-        return NextResponse.redirect(target);
-      }
       const res = await fetch(`${base}/api/personal/files`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
@@ -255,8 +308,7 @@ export async function DELETE(request: NextRequest) {
 
   if (isLocalServerAvailable()) {
     try {
-      const safeName = sanitizeFileName(filename);
-      const fullPath = path.join(SERVER_FILES_DIR, safeName);
+      const fullPath = resolveSafeServerFilePath(filename);
       if (!fs.existsSync(fullPath)) {
         return NextResponse.json({ success: false, error: 'Archivo no encontrado' }, { status: 404 });
       }
@@ -264,7 +316,7 @@ export async function DELETE(request: NextRequest) {
       const { files, totalBytes } = listLocalServerFiles();
       return NextResponse.json({
         success: true,
-        message: `Archivo ${safeName} eliminado`,
+        message: `Archivo ${path.basename(fullPath)} eliminado`,
         serverDir: SERVER_FILES_DIR,
         totalBytes,
         files,
@@ -278,7 +330,7 @@ export async function DELETE(request: NextRequest) {
   for (const base of candidates) {
     try {
       const res = await fetch(
-        `${base}/api/personal/files/${encodeURIComponent(filename)}`,
+        `${base}/api/personal/files?file=${encodeURIComponent(filename)}`,
         { method: 'DELETE' }
       );
       if (res.ok) {
