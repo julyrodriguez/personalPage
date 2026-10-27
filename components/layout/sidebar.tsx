@@ -20,6 +20,7 @@ import {
   Monitor,
   School,
   BookOpen,
+  FolderUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -37,6 +38,13 @@ const NAV_ITEMS = [
     icon: Server,
     description: 'Hardware, Logs & Control',
     badge: 'Live',
+  },
+  {
+    name: 'Archivos',
+    href: '/archivos',
+    icon: FolderUp,
+    description: 'Subir a /vacas-locas/archivos',
+    badge: 'Upload',
   },
   {
     name: 'Escritorio Remoto',
